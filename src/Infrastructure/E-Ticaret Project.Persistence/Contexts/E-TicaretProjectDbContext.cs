@@ -1,4 +1,5 @@
 ﻿using E_Ticaret_Project.Domain.Entities;
+using E_Ticaret_Project.Persistence.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,4 +19,12 @@ public class E_TicaretProjectDbContext:IdentityDbContext<AppUser>
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ReviewAndComment> ReviewAndComments { get; set; }
+
+
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CategoryConfiguration).Assembly);
+        base.OnModelCreating(modelBuilder);
+    }
 }
