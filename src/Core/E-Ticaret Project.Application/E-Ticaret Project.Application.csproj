@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>E_Ticaret_Project.Application</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Abstracts\Services\" />
+    <Folder Include="Abstracts\Repositories\" />
+    <Folder Include="DTOs\" />
+    <Folder Include="Validations\" />
+    <Folder Include="Shared\Settings\" />
+    <Folder Include="Shared\Permissions\" />
+    <Folder Include="Shared\Responses\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\E-Ticaret Project.Domain\E-Ticaret Project.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
