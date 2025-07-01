@@ -6,7 +6,7 @@ public class Order:BaseEntity
     public DateTime OrderDate { get; set; }
 
 
-    public Guid BuyerId { get; set; }
+    public string BuyerId { get; set; }
     public AppUser Buyer { get; set; }
 
     public ICollection<OrderItem> Items { get; set; }=new List<OrderItem>();

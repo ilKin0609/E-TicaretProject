@@ -9,7 +9,7 @@ public class Product:BaseEntity
     public Guid CategoryId { get; set; }
     public Category Category { get; set; }
 
-    public Guid OwnerId { get; set; }
+    public string OwnerId { get; set; }
     public AppUser Owner { get; set; }
 
     public Guid FavoriteId { get; set; }
