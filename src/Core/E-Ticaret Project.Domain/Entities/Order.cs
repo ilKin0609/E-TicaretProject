@@ -8,6 +8,7 @@ public class Order:BaseEntity
     public string TrackingCode { get; set; }
     public string? ShippingAddress { get; set; }
     public string ShoppingAddress { get; set; }
+    public decimal TotalPrice { get; set; }
 
 
     public string BuyerId { get; set; }

@@ -1,14 +1,28 @@
+using E_Ticaret_Project.Application.Shared.Permissions;
+using E_Ticaret_Project.Application.Shared.Settings;
+using E_Ticaret_Project.Application.Validations.CategoryValidations;
 using E_Ticaret_Project.Domain.Entities;
+using E_Ticaret_Project.Persistence;
 using E_Ticaret_Project.Persistence.Contexts;
+using E_Ticaret_Project.WebApi.Middlewares;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddValidatorsFromAssembly(typeof(CategoryCreateDtoValidator).Assembly);
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -63,6 +77,43 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<E_TicaretProjectDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JWTSettings>();
+
+builder.Services.AddAuthorization(options =>
+{
+
+    foreach (var permission in PermissionHelper.GetAllPermissionList())
+    {
+        options.AddPolicy(permission, policy =>
+            policy.RequireClaim("Permission", permission));
+    }
+});
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+    };
+});
+
+builder.Services.RegisterService();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -73,7 +124,8 @@ if (app.Environment.IsDevelopment())
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

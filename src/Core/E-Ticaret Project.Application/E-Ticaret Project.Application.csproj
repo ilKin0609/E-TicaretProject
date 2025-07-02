@@ -8,12 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Abstracts\Services\" />
-    <Folder Include="DTOs\" />
-    <Folder Include="Validations\" />
-    <Folder Include="Shared\Settings\" />
-    <Folder Include="Shared\Permissions\" />
-    <Folder Include="Shared\Responses\" />
+    <Folder Include="DTOs\FavoriteDtos\" />
+    <Folder Include="DTOs\ImageDtos\" />
+    <Folder Include="DTOs\UserDtos\" />
+    <Folder Include="DTOs\ReviewAndCommentDtos\" />
+    <Folder Include="DTOs\OrderDtos\" />
+    <Folder Include="DTOs\ProductDtos\" />
+    <Folder Include="Validations\FavoriteValidations\" />
+    <Folder Include="Validations\ImageValidations\" />
+    <Folder Include="Validations\UserValidations\" />
+    <Folder Include="Validations\ReviewAndCommentValidations\" />
+    <Folder Include="Validations\ProductValidations\" />
+    <Folder Include="Validations\OrderValidations\" />
   </ItemGroup>
 
   <ItemGroup>

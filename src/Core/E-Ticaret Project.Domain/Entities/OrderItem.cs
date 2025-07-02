@@ -4,7 +4,6 @@ public class OrderItem
 {
     public int OrderCount { get; set; }
     public decimal FirstPrice { get; set; }
-    public decimal TotalPrice => OrderCount * FirstPrice;
 
 
     public Guid OrderId { get; set; }
