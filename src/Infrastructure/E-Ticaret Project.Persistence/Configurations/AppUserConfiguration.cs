@@ -8,6 +8,14 @@ public class AppUserConfiguration:IEntityTypeConfiguration<AppUser>
 {
     public void Configure(EntityTypeBuilder<AppUser> builder)
     {
+        builder.Property(U => U.FullName)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(U => U.ProfileImageUrl)
+            .HasMaxLength(300);
+
+
         builder.HasMany(U=>U.Buyers)
             .WithOne(O=>O.Buyer)
             .HasForeignKey(O=>O.BuyerId)
@@ -21,6 +29,11 @@ public class AppUserConfiguration:IEntityTypeConfiguration<AppUser>
         builder.HasMany(U => U.Comments)
             .WithOne(Rc => Rc.User)
             .HasForeignKey(Rc => Rc.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(U => U.Favorites)
+            .WithOne(F => F.User)
+            .HasForeignKey(F => F.UserId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

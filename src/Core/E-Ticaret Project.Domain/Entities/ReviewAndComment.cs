@@ -11,4 +11,8 @@ public class ReviewAndComment:BaseEntity
     public Guid ProductId { get; set; }
     public Product Product { get; set; }
 
+    public Guid? ParentId { get; set; }
+    public ReviewAndComment? Parent { get; set; }
+    public ICollection<ReviewAndComment> Replies { get; set; }
+
 }

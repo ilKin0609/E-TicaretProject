@@ -8,9 +8,10 @@ public class FavoriteConfiguration : IEntityTypeConfiguration<Favorite>
 {
     public void Configure(EntityTypeBuilder<Favorite> builder)
     {
-        builder.HasMany(F=>F.Products)
-            .WithOne(P=>P.Favorite)
-            .HasForeignKey(P=>P.FavoriteId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasKey(F => new { F.UserId, F.ProductId });
+
+        builder.HasOne(F => F.Product)
+            .WithMany(F => F.Favorites)
+            .HasForeignKey(F => F.ProductId);
     }
 }

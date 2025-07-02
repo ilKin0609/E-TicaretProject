@@ -43,7 +43,8 @@ namespace E_Ticaret_Project.Persistence.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -67,6 +68,10 @@ namespace E_Ticaret_Project.Persistence.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ProfileImageUrl")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -108,7 +113,7 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         .HasMaxLength(350)
                         .HasColumnType("nvarchar(350)");
 
-                    b.Property<Guid>("ParentCategoryId")
+                    b.Property<Guid?>("ParentCategoryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -126,8 +131,10 @@ namespace E_Ticaret_Project.Persistence.Migrations
 
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Favorite", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -136,13 +143,18 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<Guid?>("CreatedUser")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UpdatedUser")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId", "ProductId");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("Favorites");
                 });
@@ -208,6 +220,24 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ShippingAddress")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("ShoppingAddress")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("TrackingCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -217,6 +247,9 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BuyerId");
+
+                    b.HasIndex("TrackingCode")
+                        .IsUnique();
 
                     b.ToTable("Orders");
                 });
@@ -258,12 +291,11 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<Guid>("FavoriteId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<decimal?>("Discount")
+                        .HasColumnType("decimal(2,1)");
 
                     b.Property<string>("OwnerId")
                         .IsRequired()
@@ -271,6 +303,12 @@ namespace E_Ticaret_Project.Persistence.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
 
                     b.Property<string>("Tittle")
                         .IsRequired()
@@ -286,8 +324,6 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("FavoriteId");
 
                     b.HasIndex("OwnerId");
 
@@ -311,6 +347,9 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<Guid?>("CreatedUser")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
@@ -325,6 +364,8 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.HasIndex("ProductId");
 
@@ -471,10 +512,28 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.HasOne("E_Ticaret_Project.Domain.Entities.Category", "ParentCategory")
                         .WithMany("SubCategories")
                         .HasForeignKey("ParentCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Favorite", b =>
+                {
+                    b.HasOne("E_Ticaret_Project.Domain.Entities.Product", "Product")
+                        .WithMany("Favorites")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("E_Ticaret_Project.Domain.Entities.AppUser", "User")
+                        .WithMany("Favorites")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("ParentCategory");
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Image", b =>
@@ -526,12 +585,6 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("E_Ticaret_Project.Domain.Entities.Favorite", "Favorite")
-                        .WithMany("Products")
-                        .HasForeignKey("FavoriteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("E_Ticaret_Project.Domain.Entities.AppUser", "Owner")
                         .WithMany("Sellers")
                         .HasForeignKey("OwnerId")
@@ -540,13 +593,16 @@ namespace E_Ticaret_Project.Persistence.Migrations
 
                     b.Navigation("Category");
 
-                    b.Navigation("Favorite");
-
                     b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.ReviewAndComment", b =>
                 {
+                    b.HasOne("E_Ticaret_Project.Domain.Entities.ReviewAndComment", "Parent")
+                        .WithMany("Replies")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("E_Ticaret_Project.Domain.Entities.Product", "Product")
                         .WithMany("Comments")
                         .HasForeignKey("ProductId")
@@ -558,6 +614,8 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Parent");
 
                     b.Navigation("Product");
 
@@ -621,6 +679,8 @@ namespace E_Ticaret_Project.Persistence.Migrations
 
                     b.Navigation("Comments");
 
+                    b.Navigation("Favorites");
+
                     b.Navigation("Sellers");
                 });
 
@@ -629,11 +689,6 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Navigation("Products");
 
                     b.Navigation("SubCategories");
-                });
-
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Favorite", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Order", b =>
@@ -645,9 +700,16 @@ namespace E_Ticaret_Project.Persistence.Migrations
                 {
                     b.Navigation("Comments");
 
+                    b.Navigation("Favorites");
+
                     b.Navigation("Images");
 
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.ReviewAndComment", b =>
+                {
+                    b.Navigation("Replies");
                 });
 #pragma warning restore 612, 618
         }

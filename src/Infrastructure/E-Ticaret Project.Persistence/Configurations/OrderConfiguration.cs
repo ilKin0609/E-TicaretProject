@@ -10,8 +10,26 @@ public class OrderConfiguration: IEntityTypeConfiguration<Order>
     {
         builder.Property(O=>O.OrderStatus)
             .IsRequired();
+
         builder.Property(O => O.OrderDate)
             .IsRequired();
+
+        builder.Property(O => O.TrackingCode)
+            .IsRequired();
+
+        builder.HasIndex(O => O.TrackingCode)
+            .IsUnique();
+
+        builder.Property(O => O.PaymentMethod)
+            .IsRequired()
+            .HasMaxLength(20);
+
+        builder.Property(O => O.ShippingAddress)
+            .HasMaxLength(300);
+
+        builder.Property(O => O.ShoppingAddress)
+            .IsRequired()
+            .HasMaxLength(300);
 
         builder.HasMany(O => O.Items)
             .WithOne(Oi => Oi.Order)
