@@ -17,8 +17,8 @@ public class Product:BaseEntity
 
 
 
-    public ICollection<OrderItem> Items { get; set; }=new List<OrderItem>();
-    public ICollection<Image> Images { get; set; }=new List<Image>();
+    public ICollection<OrderItem> Items { get; set; }
+    public ICollection<Image> Images { get; set; }
     public ICollection<ReviewAndComment> Comments { get; set; }
     public ICollection<Favorite> Favorites { get; set; }
 }

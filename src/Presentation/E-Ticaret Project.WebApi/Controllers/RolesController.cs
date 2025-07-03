@@ -48,10 +48,10 @@ namespace E_Ticaret_Project.WebApi.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        [HttpDelete("{RoleName}")]
+        public async Task<IActionResult> Delete(string RoleName)
         {
-            var result = await _roleservice.DeleteRole(id);
+            var result = await _roleservice.DeleteRole(RoleName);
             return StatusCode((int)result.StatusCode, result);
         }
     }

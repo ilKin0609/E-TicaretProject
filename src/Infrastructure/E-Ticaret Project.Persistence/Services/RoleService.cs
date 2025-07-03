@@ -1,6 +1,7 @@
 ﻿using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.DTOs.RoleDtos;
 using E_Ticaret_Project.Application.Shared.Responses;
+using E_Ticaret_Project.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Net;
 using System.Security.Claims;
@@ -10,10 +11,12 @@ namespace E_Ticaret_Project.Persistence.Services;
 public class RoleService:IRoleService
 {
     public RoleManager<IdentityRole> _roleManager { get; }
+    public UserManager<AppUser> _userManager { get; }
 
-    public RoleService(RoleManager<IdentityRole> roleManager)
+    public RoleService(RoleManager<IdentityRole> roleManager,UserManager<AppUser> userManager)
     {
         _roleManager = roleManager;
+        _userManager = userManager;
     }
 
     public async Task<BaseResponse<RoleGetDto>> RoleGetByIdAsync(string RoleId)
@@ -101,13 +104,20 @@ public class RoleService:IRoleService
         return new("Role succesfully updated", true, HttpStatusCode.OK);
     }
 
-    public async Task<BaseResponse<string?>> DeleteRole(string id)
+    public async Task<BaseResponse<string?>> DeleteRole(string RoleName)
     {
-        var role = await _roleManager.FindByIdAsync(id);
+        var role = await _roleManager.FindByNameAsync(RoleName);
         if (role is null)
             return new("Role is not found", HttpStatusCode.NotFound);
 
-        await _roleManager.DeleteAsync(role);
+        var userRole = await _userManager.GetUsersInRoleAsync(role.Name);
+        if (userRole.Any())
+            return new("Cannot delete role because there are users assigned to it", HttpStatusCode.BadRequest);
+
+        var result=await _roleManager.DeleteAsync(role);
+        if (!result.Succeeded)
+            return new("Something went wrong while deleting the role",HttpStatusCode.BadRequest);
+
         return new("Role succesfully deleted", true, HttpStatusCode.OK);
     }
 

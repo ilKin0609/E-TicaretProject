@@ -9,7 +9,8 @@ public class OrderConfiguration: IEntityTypeConfiguration<Order>
     public void Configure(EntityTypeBuilder<Order> builder)
     {
         builder.Property(O=>O.OrderStatus)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion<string>();
 
         builder.Property(O => O.OrderDate)
             .IsRequired();
@@ -22,7 +23,7 @@ public class OrderConfiguration: IEntityTypeConfiguration<Order>
 
         builder.Property(O => O.PaymentMethod)
             .IsRequired()
-            .HasMaxLength(20);
+            .HasConversion<string>();
 
         builder.Property(O => O.ShippingAddress)
             .HasMaxLength(300);
