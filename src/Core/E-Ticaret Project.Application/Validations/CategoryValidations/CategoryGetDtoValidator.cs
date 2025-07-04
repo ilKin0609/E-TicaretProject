@@ -7,6 +7,6 @@ public class CategoryGetDtoValidator:AbstractValidator<CategoryGetDto>
 {
     public CategoryGetDtoValidator()
     {
-
+        
     }
 }
