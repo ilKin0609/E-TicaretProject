@@ -8,12 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Validations\FavoriteValidations\" />
-    <Folder Include="Validations\ImageValidations\" />
     <Folder Include="Validations\UserValidations\" />
     <Folder Include="Validations\ReviewAndCommentValidations\" />
     <Folder Include="Validations\ProductValidations\" />
-    <Folder Include="Validations\OrderValidations\" />
   </ItemGroup>
 
   <ItemGroup>

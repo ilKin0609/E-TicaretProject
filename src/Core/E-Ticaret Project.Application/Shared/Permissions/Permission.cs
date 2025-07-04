@@ -46,11 +46,19 @@ public static class Permission
     {
         public const string Create = "Order.Create";
         public const string Delete = "Order.Delete";
+        public const string Update = "Order.Update";
+        public const string GetMy = "Order.GetMy";
+        public const string GetAll = "Order.GetAll";
+        public const string GetMySales = "Order.Delete";
 
         public static List<string> All = new()
         {
             Create,
-            Delete
+            Delete,
+            Update,
+            GetMy,
+            GetAll,
+            GetMySales
         };
     }
     public static class Product
@@ -58,12 +66,18 @@ public static class Permission
         public const string Create = "Product.Create";
         public const string Update = "Product.Update";
         public const string Delete = "Product.Delete";
+        public const string GetMy = "Product.GetMy";
+        public const string DeleteProductImage = "Product.DeleteProductImage";
+        public const string AddProductImage = "Product.AddProductImage";
 
         public static List<string> All = new()
         {
             Create,
             Update,
-            Delete
+            Delete,
+            GetMy,
+            DeleteProductImage,
+            AddProductImage
         };
     }
     public static class ReviewAndComment

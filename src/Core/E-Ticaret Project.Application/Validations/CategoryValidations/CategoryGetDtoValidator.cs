@@ -7,6 +7,8 @@ public class CategoryGetDtoValidator:AbstractValidator<CategoryGetDto>
 {
     public CategoryGetDtoValidator()
     {
-        
+        RuleFor(Ct=>Ct.Id)
+            .NotEmpty()
+            .WithMessage("Id cannot be null");
     }
 }
