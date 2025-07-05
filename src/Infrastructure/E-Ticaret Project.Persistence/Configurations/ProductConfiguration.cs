@@ -19,12 +19,6 @@ public class ProductConfiguration: IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasColumnType("decimal(18,2)");
 
-        builder.Property(P => P.Discount)
-            .HasColumnType("decimal(2,1)");
-
-        builder.Property(P => P.Rating)
-            .IsRequired();
-
         builder.Property(P => P.Stock)
             .IsRequired();
 

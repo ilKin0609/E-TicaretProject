@@ -1,4 +1,4 @@
-﻿using E_Ticaret_Project.Application.DTOs.ImageDtos;
+﻿
 using E_Ticaret_Project.Application.DTOs.ReviewAndCommentDtos;
 
 namespace E_Ticaret_Project.Application.DTOs.ProductDtos;
@@ -14,6 +14,5 @@ public record ProductGetDto(
     int Stock,
     Guid CategoryId,
     string OwnerId,
-    List<ImageGetDto>? Images,
     List<ReviewAndCommentGetDto>? Comments
 );

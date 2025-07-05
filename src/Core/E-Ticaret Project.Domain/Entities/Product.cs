@@ -5,8 +5,8 @@ public class Product:BaseEntity
     public string Tittle { get; set; }
     public string? Description { get; set; }
     public decimal Price { get; set; }
-    public decimal? Discount { get; set; }
-    public decimal Rating { get; set; }
+    public int? Discount { get; set; }
+    public decimal? Rating { get; set; }
     public int Stock { get; set; }
 
     public Guid CategoryId { get; set; }
