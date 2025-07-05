@@ -26,18 +26,21 @@ public class UserAuthenticationService : IUserAuthenticationService
     private IEmailService _mailService { get; }
     private RoleManager<IdentityRole> _roleManager { get; }
     private JWTSettings _jwtSetting { get; }
+    private IFavoriteService _favoriteService { get; }
 
     public UserAuthenticationService(UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
     IOptions<JWTSettings> jwtSetting,
     RoleManager<IdentityRole> roleManager,
-    IEmailService mailService)
+    IEmailService mailService,
+    IFavoriteService favoriteService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtSetting = jwtSetting.Value;
         _roleManager = roleManager;
         _mailService = mailService;
+        _favoriteService = favoriteService;
     }
     public async Task<BaseResponse<string>> Register(UserRegisterDto dto)
     {
@@ -119,7 +122,7 @@ public class UserAuthenticationService : IUserAuthenticationService
 
         //var orders = await _orderService.GetOrdersByUserId(user.Id);
         //var products = await _productService.GetProductsByUserId(user.Id);
-        //var favorites = await _favoriteService.GetByUserId(user.Id);
+        var favorites = await _favoriteService.MyFavorities(user.Id);
 
         var response = new UserAbout(
         Token: token,

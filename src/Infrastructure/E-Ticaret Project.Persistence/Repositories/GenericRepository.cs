@@ -50,8 +50,8 @@ public class GenericRepository<T>:IRepository<T> where T : BaseEntity, new()
         return query;
     }
 
-    public IQueryable<T> GetByIdFiltered(Expression<Func<T, bool>>? predicate,
-        Expression<Func<T, object>>[]? include,
+    public IQueryable<T> GetByIdFiltered(Expression<Func<T, bool>>? predicate=null,
+        Expression<Func<T, object>>[]? include = null,
         bool isTracking = false)
     {
         IQueryable<T> query = Table;
@@ -73,9 +73,9 @@ public class GenericRepository<T>:IRepository<T> where T : BaseEntity, new()
         return query;
     }
 
-    public IQueryable<T> GetAllFiltered(Expression<Func<T, bool>>? predicate,
-        Expression<Func<T, object>>[]? include,
-        Expression<Func<T, object>>? OrderBy,
+    public IQueryable<T> GetAllFiltered(Expression<Func<T, bool>>? predicate=null,
+        Expression<Func<T, object>>[]? include=null,
+        Expression<Func<T, object>>? OrderBy=null,
         bool isOrderBy = true,
         bool isTracking = false)
     {
@@ -107,7 +107,7 @@ public class GenericRepository<T>:IRepository<T> where T : BaseEntity, new()
         return query;
     }
 
-    public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate)
+    public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null)
     {
         
         if(predicate is not null)
@@ -116,9 +116,9 @@ public class GenericRepository<T>:IRepository<T> where T : BaseEntity, new()
         return await Table.CountAsync();
     }
 
-    public async Task<bool> AnyAsync(Expression<Func<Favorite, bool>> predicate)
+    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
     {
-        return await _context.Favorites.AnyAsync(predicate);
+        return await Table.AnyAsync(predicate);
     }
 
     public async Task SaveChangeAsync()
