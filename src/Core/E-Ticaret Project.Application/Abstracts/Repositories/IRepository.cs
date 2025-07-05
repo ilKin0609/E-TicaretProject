@@ -20,6 +20,7 @@ public interface IRepository<T> where T: BaseEntity, new()
         bool isTracking=false);
 
     Task<int> CountAsync(Expression<Func<T, bool>>? predicate);
+    Task<bool> AnyAsync(Expression<Func<Favorite, bool>> predicate);
 
     Task AddAsync(T entity);
     void Update(T entity);

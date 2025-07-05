@@ -7,8 +7,8 @@ public class UserAboutValidator:AbstractValidator<UserAbout>
 {
     public UserAboutValidator()
     {
-        RuleFor(U => U.Id)
+        RuleFor(U => U.Token)
             .NotEmpty()
-            .WithMessage("UserId cannot be null");
+            .WithMessage("Token cannot be null");
     }
 }

@@ -7,6 +7,7 @@ namespace E_Ticaret_Project.Application.DTOs.UserAuthenticationDtos;
 
 public record UserAbout(
 
+    string Token,
     string Id,
     string FullName,
     string Email,

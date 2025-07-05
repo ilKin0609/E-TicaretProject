@@ -27,6 +27,8 @@ public static class Registiration
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IUserAuthenticationService, UserAuthenticationService>();
+        services.AddScoped<IFavoriteService, FavoriteService>();
 
         #endregion
     }

@@ -116,6 +116,11 @@ public class GenericRepository<T>:IRepository<T> where T : BaseEntity, new()
         return await Table.CountAsync();
     }
 
+    public async Task<bool> AnyAsync(Expression<Func<Favorite, bool>> predicate)
+    {
+        return await _context.Favorites.AnyAsync(predicate);
+    }
+
     public async Task SaveChangeAsync()
     {
         await _context.SaveChangesAsync();

@@ -1,4 +1,6 @@
-﻿namespace E_Ticaret_Project.Application.DTOs.ProductDtos;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace E_Ticaret_Project.Application.DTOs.ProductDtos;
 
 public record ProductCreateDto(
     string Tittle,
@@ -7,5 +9,6 @@ public record ProductCreateDto(
     decimal? Discount,
     decimal? Rating,
     int Stock,
+    List<IFormFile>? image,
     Guid CategoryId
 );

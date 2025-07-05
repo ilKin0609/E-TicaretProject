@@ -4,44 +4,20 @@ public static class Permission
 {
     public static class Category
     {
-        public const string Create = "Category.Create";
+        public const string MainCreate = "Category.MainCreate";
+        public const string SubCreate = "Category.SubCreate";
         public const string Update = "Category.Update";
         public const string Delete = "Category.Delete";
 
         public static List<string> All = new()
         {
-            Create,
+            MainCreate,
+            SubCreate,
             Update,
             Delete
         };
     }
 
-    public static class Favorite
-    {
-        public const string Create = "Favorite.Create";
-        public const string Update = "Favorite.Update";
-        public const string Delete = "Favorite.Delete";
-
-        public static List<string> All = new()
-        {
-            Create,
-            Update,
-            Delete
-        };
-    }
-    public static class Image
-    {
-        public const string Create = "Image.Create";
-        public const string Update = "Image.Update";
-        public const string Delete = "Image.Delete";
-
-        public static List<string> All = new()
-        {
-            Create,
-            Update,
-            Delete
-        };
-    }
     public static class Order
     {
         public const string Create = "Order.Create";
@@ -49,7 +25,8 @@ public static class Permission
         public const string Update = "Order.Update";
         public const string GetMy = "Order.GetMy";
         public const string GetAll = "Order.GetAll";
-        public const string GetMySales = "Order.Delete";
+        public const string GetDetail = "Order.GetDetail";
+        public const string GetMySales = "Order.MySales";
 
         public static List<string> All = new()
         {
@@ -58,7 +35,8 @@ public static class Permission
             Update,
             GetMy,
             GetAll,
-            GetMySales
+            GetMySales,
+            GetDetail
         };
     }
     public static class Product
@@ -69,6 +47,8 @@ public static class Permission
         public const string GetMy = "Product.GetMy";
         public const string DeleteProductImage = "Product.DeleteProductImage";
         public const string AddProductImage = "Product.AddProductImage";
+        public const string AddProductFavorite = "Product.AddProductFavorite";
+        public const string DeleteProductFavorite = "Product.DeleteProductFavorite";
 
         public static List<string> All = new()
         {
@@ -77,19 +57,19 @@ public static class Permission
             Delete,
             GetMy,
             DeleteProductImage,
-            AddProductImage
+            AddProductImage,
+            AddProductFavorite,
+            DeleteProductFavorite
         };
     }
     public static class ReviewAndComment
     {
         public const string Create = "ReviewAndComment.Create";
-        public const string Update = "ReviewAndComment.Update";
         public const string Delete = "ReviewAndComment.Delete";
 
         public static List<string> All = new()
         {
             Create,
-            Update,
             Delete
         };
     }
@@ -98,22 +78,43 @@ public static class Permission
         public const string GetAllPermissions = "Role.GetAllPermissions";
         public const string Create = "Role.Create";
         public const string Update = "Role.Update";
+        public const string Delete = "Role.Delete";
 
         public static List<string> All = new()
         {
             GetAllPermissions,
             Create,
-            Update
+            Update,
+            Delete
         };
     }
     public static class Account
     {
         public const string AddRole = "Account.AddRole";
+        public const string Create = "Account.Create";
+        public const string GetAllUser = "Account.GetAllUser";
+        public const string GetUser = "Account.GetUser";
 
 
         public static List<string> All = new()
         {
-           AddRole
+           AddRole,
+           Create,
+           GetAllUser,
+           GetUser
+        };
+    }
+
+    public static class User
+    {
+        public const string ResetPassword = "User.ResetPassword";
+        public const string GetMy = "User.GetMy";
+
+
+        public static List<string> All = new()
+        {
+           ResetPassword,
+           GetMy
         };
     }
 }
