@@ -27,13 +27,15 @@ public class UserAuthenticationService : IUserAuthenticationService
     private RoleManager<IdentityRole> _roleManager { get; }
     private JWTSettings _jwtSetting { get; }
     private IFavoriteService _favoriteService { get; }
+    private IProductService _productService { get; }
 
     public UserAuthenticationService(UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
     IOptions<JWTSettings> jwtSetting,
     RoleManager<IdentityRole> roleManager,
     IEmailService mailService,
-    IFavoriteService favoriteService)
+    IFavoriteService favoriteService,
+    IProductService productService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -41,6 +43,7 @@ public class UserAuthenticationService : IUserAuthenticationService
         _roleManager = roleManager;
         _mailService = mailService;
         _favoriteService = favoriteService;
+        _productService = productService;
     }
     public async Task<BaseResponse<string>> Register(UserRegisterDto dto)
     {
@@ -121,7 +124,7 @@ public class UserAuthenticationService : IUserAuthenticationService
         var roleName = roles.FirstOrDefault();
 
         //var orders = await _orderService.GetOrdersByUserId(user.Id);
-        //var products = await _productService.GetProductsByUserId(user.Id);
+        var products = await _productService.GetMyProducts(userId);
         var favorites = await _favoriteService.MyFavorities(user.Id);
 
         var response = new UserAbout(
@@ -132,8 +135,8 @@ public class UserAuthenticationService : IUserAuthenticationService
         ProfileImageUrl: user.ProfileImageUrl,
         Role: Enum.Parse<RoleEnum>(roleName),
         Buyers: null,
-        Sellers: null,
-        Favorites: null
+        Sellers: products.Data,
+        Favorites: favorites.Data
     );
        return new("Success",response,HttpStatusCode.OK); 
 

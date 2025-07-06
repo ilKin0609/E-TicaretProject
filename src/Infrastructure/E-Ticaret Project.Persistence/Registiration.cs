@@ -29,6 +29,8 @@ public static class Registiration
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IUserAuthenticationService, UserAuthenticationService>();
         services.AddScoped<IFavoriteService, FavoriteService>();
+        services.AddScoped<IReviewAndCommentService, ReviewAndCommentService>();
+        services.AddScoped<IProductService, ProductService>();
 
         #endregion
     }

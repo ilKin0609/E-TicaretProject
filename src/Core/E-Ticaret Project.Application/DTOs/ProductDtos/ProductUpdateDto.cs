@@ -8,9 +8,10 @@ public record ProductUpdateDto(
     string Title,
     string? Description,
     decimal Price,
-    decimal? Discount,
+    int? Discount,
     decimal? Rating,
     int? Stock,
+    List<IFormFile>? Images,
     Guid? CategoryId
 );
 

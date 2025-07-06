@@ -22,4 +22,8 @@
     <ProjectReference Include="..\..\Infrastructure\E-Ticaret Project.Persistence\E-Ticaret Project.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Images\" />
+  </ItemGroup>
+
 </Project>

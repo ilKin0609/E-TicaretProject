@@ -113,6 +113,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.RegisterService();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -129,5 +130,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseStaticFiles();
 
 app.Run();

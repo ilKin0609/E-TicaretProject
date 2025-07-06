@@ -14,5 +14,6 @@ public record ProductGetDto(
     int Stock,
     Guid CategoryId,
     string OwnerId,
-    List<ReviewAndCommentGetDto>? Comments
+    List<string>? ImageUrls
+
 );
