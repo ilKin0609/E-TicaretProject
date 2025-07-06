@@ -31,6 +31,7 @@ public static class Registiration
         services.AddScoped<IFavoriteService, FavoriteService>();
         services.AddScoped<IReviewAndCommentService, ReviewAndCommentService>();
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IAccountService, AccountService>();
 
         #endregion
     }

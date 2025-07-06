@@ -7,5 +7,5 @@ public record UserGetDto(
     string Id,
     string FullName,
     string Email,
-    RoleAdminEnum Role
+    string Role
 );
