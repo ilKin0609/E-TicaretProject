@@ -14,5 +14,5 @@ public record OrderGetDto(
     string ShoppingAddress,
     decimal TotalPrice,
     string BuyerId,
-    List<OrderItemGetDto> Items
+    ICollection<OrderItemGetDto> Items
 );

@@ -86,7 +86,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDto dto)
+        public async Task<IActionResult> CreateProduct([FromForm] ProductCreateDto dto)
         {
             var result = await _productService.CreateProduct(dto);
             return StatusCode((int)result.StatusCode, result);
