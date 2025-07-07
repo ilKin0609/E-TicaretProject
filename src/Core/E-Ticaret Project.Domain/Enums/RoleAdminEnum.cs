@@ -2,8 +2,8 @@
 
 public enum RoleAdminEnum
 {
-    Seller = 0,
-    Buyer = 1,
-    Moderator=2,
-    Admin=3
+    Seller = 1,
+    Buyer = 2,
+    Moderator=3,
+    Admin=4
 }

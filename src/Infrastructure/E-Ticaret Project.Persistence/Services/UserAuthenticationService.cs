@@ -112,7 +112,7 @@ public class UserAuthenticationService : IUserAuthenticationService
 
         var jwtToken = handler.ReadJwtToken(token);
 
-        var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value;
         if (userId is null)
             return new("User not found", HttpStatusCode.NotFound);
 

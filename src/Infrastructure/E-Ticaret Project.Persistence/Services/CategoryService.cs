@@ -36,7 +36,7 @@ public class CategoryService : ICategoryService
         await _categoryRepository.AddAsync(newCategory);
         await _categoryRepository.SaveChangeAsync();
 
-        return new("Category created successfully", HttpStatusCode.Created);
+        return new("Category created successfully",true, HttpStatusCode.Created);
     }
 
     public async Task<BaseResponse<string>> DeleteAsync(Guid id)
@@ -90,7 +90,7 @@ public class CategoryService : ICategoryService
         _categoryRepository.Update(category);
         await _categoryRepository.SaveChangeAsync();
 
-        return new("Category updated successfully", HttpStatusCode.OK);
+        return new("Category updated successfully", true, HttpStatusCode.OK);
     }
     public async Task<BaseResponse<List<CategoryGetDto>>> GetAllRecursiveAsync()
     {

@@ -128,9 +128,9 @@ public class AccountService : IAccountService
         if (roleName is null)
             return new("Wrong format", HttpStatusCode.BadRequest);
 
+        newUser.EmailConfirmed = true;
         await _userManager.AddToRoleAsync(newUser, roleName);
 
-        newUser.EmailConfirmed = true;
 
         return new("Succesfully created", true, HttpStatusCode.Created);
     }

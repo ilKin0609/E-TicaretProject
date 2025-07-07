@@ -2,6 +2,6 @@
 
 public enum RoleEnum
 {
-    Seller=0,
-    Buyer=1
+    Seller=1,
+    Buyer=2
 }
