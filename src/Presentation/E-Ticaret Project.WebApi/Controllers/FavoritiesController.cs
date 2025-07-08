@@ -1,6 +1,7 @@
 ﻿using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.DTOs.FavoriteDtos;
 using E_Ticaret_Project.Application.Shared.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -19,6 +20,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
         // GET: api/<FavoritiesController>
         [HttpGet]
+        [Authorize(Policy = "Favorite.GetFavProducts")]
         [ProducesResponseType(typeof(BaseResponse<List<FavoriteGetDto>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> MyFavorites([FromQuery] string userId)

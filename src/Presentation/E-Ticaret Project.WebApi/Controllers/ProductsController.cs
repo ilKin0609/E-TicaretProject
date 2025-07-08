@@ -3,6 +3,7 @@ using E_Ticaret_Project.Application.DTOs.FavoriteDtos;
 using E_Ticaret_Project.Application.DTOs.ProductDtos;
 using E_Ticaret_Project.Application.Shared.Responses;
 using E_Ticaret_Project.Persistence.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -52,6 +53,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Product.GetMy")]
         [ProducesResponseType(typeof(BaseResponse<List<ProductGetDto>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -84,6 +86,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // POST api/<ProductsController>
         [HttpPost]
+        [Authorize(Policy = "Product.Create")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -95,6 +98,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "Product.AddProductFavorite")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -105,6 +109,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "Product.AddProductImage")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -117,6 +122,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // PUT api/<ProductsController>/5
         [HttpPut]
+        [Authorize(Policy = "Product.Update")]
         [ProducesResponseType(typeof(BaseResponse<ProductUpdateDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -128,6 +134,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // DELETE api/<ProductsController>/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "Product.Delete")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -137,17 +144,19 @@ namespace E_Ticaret_Project.WebApi.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{Id}")]
+        [Authorize(Policy = "Product.DeleteProductFavorite")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RemoveProductFavorite(Guid id)
+        public async Task<IActionResult> RemoveProductFavorite(Guid Id)
         {
-            var result = await _productService.RemoveProductFavorite(id);
+            var result = await _productService.RemoveProductFavorite(Id);
             return StatusCode((int)result.StatusCode, result);
         }
 
         [HttpDelete("{imageId}")]
+        [Authorize(Policy = "Product.DeleteProductImage")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]

@@ -1,6 +1,7 @@
 ﻿using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.DTOs.CategoryDtos;
 using E_Ticaret_Project.Application.Shared.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -55,6 +56,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // POST api/<CategoriesController>
         [HttpPost]
+        [Authorize(Policy = "Category.Create")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -66,6 +68,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // PUT api/<CategoriesController>/5
         [HttpPut]
+        [Authorize(Policy = "Category.Update")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -78,6 +81,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // DELETE api/<CategoriesController>/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "Category.Delete")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]

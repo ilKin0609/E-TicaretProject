@@ -3,6 +3,7 @@ using E_Ticaret_Project.Application.DTOs.ReviewAndCommentDtos;
 using E_Ticaret_Project.Application.DTOs.UserAuthenticationDtos;
 using E_Ticaret_Project.Application.Shared.Responses;
 using E_Ticaret_Project.Persistence.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -21,6 +22,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
             _commentService = commentService;
         }
         [HttpGet]
+        [Authorize(Policy = "ReviewAndComment.GetByProductId")]
         [ProducesResponseType(typeof(BaseResponse<List<ReviewAndCommentGetDto>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -33,6 +35,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // POST api/<ReviewAndCommentsController>
         [HttpPost]
+        [Authorize(Policy = "ReviewAndComment.Create")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> AddComment([FromBody] ReviewAndCommentCreateDto dto)
@@ -43,6 +46,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // DELETE api/<ReviewAndCommentsController>/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "ReviewAndComment.Delete")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]

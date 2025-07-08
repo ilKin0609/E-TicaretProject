@@ -2,6 +2,7 @@
 using E_Ticaret_Project.Application.DTOs.UserAuthenticationDtos;
 using E_Ticaret_Project.Application.Shared;
 using E_Ticaret_Project.Application.Shared.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -44,6 +45,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
 
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(BaseResponse<TokenResponse>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -56,6 +58,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -68,6 +71,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "User.ResetPassword")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -91,6 +95,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "User.GetMy")]
         [ProducesResponseType(typeof(BaseResponse<UserAbout>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]

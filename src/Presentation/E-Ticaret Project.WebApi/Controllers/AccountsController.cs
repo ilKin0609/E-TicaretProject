@@ -1,6 +1,7 @@
 ﻿using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.DTOs.UserDtos;
 using E_Ticaret_Project.Application.Shared.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -21,6 +22,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // GET: api/<AccountsController>
         [HttpGet]
+        [Authorize(Policy = "Account.GetAllUser")]
         [ProducesResponseType(typeof(BaseResponse<List<UserGetDto>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -32,6 +34,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // GET api/<AccountsController>/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "Account.GetUser")]
         [ProducesResponseType(typeof(BaseResponse<UserGetDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -44,6 +47,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // POST api/<AccountsController>
         [HttpPost]
+        [Authorize(Policy = "Account.AddRole")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -55,6 +59,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "Account.Create")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]

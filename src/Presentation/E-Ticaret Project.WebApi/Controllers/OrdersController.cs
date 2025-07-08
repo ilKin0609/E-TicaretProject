@@ -2,6 +2,7 @@
 using E_Ticaret_Project.Application.DTOs.OrderDtos;
 using E_Ticaret_Project.Application.DTOs.ProductDtos;
 using E_Ticaret_Project.Application.Shared.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -20,6 +21,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
         // GET: api/<OrdersController>
         [HttpGet]
+        [Authorize(Policy = "Order.GetAll")]
         [ProducesResponseType(typeof(BaseResponse<List<OrderGetDto>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetAllAsync()
@@ -30,6 +32,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // GET api/<OrdersController>/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "Order.GetDetail")]
         [ProducesResponseType(typeof(BaseResponse<OrderGetDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -40,6 +43,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Order.GetMy")]
         [ProducesResponseType(typeof(BaseResponse<List<OrderGetDto>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -50,6 +54,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Order.MySales")]
         [ProducesResponseType(typeof(BaseResponse<List<OrderGetDto>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetMySalesAsync()
@@ -60,6 +65,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // POST api/<OrdersController>
         [HttpPost]
+        [Authorize(Policy = "Order.Create")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -71,6 +77,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // PUT api/<OrdersController>/5
         [HttpPut("{id}")]
+        [Authorize(Policy = "Order.Delete")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
@@ -81,6 +88,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpPut("{id},{orderStatus}")]
+        [Authorize(Policy = "Order.Update")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]

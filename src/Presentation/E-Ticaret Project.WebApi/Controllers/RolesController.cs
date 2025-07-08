@@ -1,6 +1,7 @@
 ﻿using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.DTOs.RoleDtos;
 using E_Ticaret_Project.Application.Shared.Permissions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -18,7 +19,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
         // GET: api/<RolesController>
         [HttpGet("permissions")]
-        //[Authorize(Policy = Permissions.Role.GetAllPermissions)]
+        [Authorize(Policy = "Role.GetAllPermissions")]
         public IActionResult GetAllPermissions()
         {
             var permissions = PermissionHelper.GetAllPermissions();
@@ -26,6 +27,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpGet("{RoleId}")]
+        [Authorize]
         public async Task<IActionResult> GetByIdAsync(string RoleId)
         {
             var result = await _roleservice.RoleGetByIdAsync(RoleId);
@@ -33,7 +35,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Policy = Permissions.Role.Create)]
+        [Authorize(Policy = "Role.Create")]
         public async Task<IActionResult> Create(RoleCreateDto dto)
         {
             var result = await _roleservice.CreateRole(dto);
@@ -42,6 +44,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
 
         [HttpPut]
+        [Authorize(Policy = "Role.Update")]
         public async Task<IActionResult> Update(RoleUpdateDto dto)
         {
             var result = await _roleservice.UpdateRole(dto);
@@ -49,6 +52,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpDelete("{RoleName}")]
+        [Authorize(Policy = "Role.Delete")]
         public async Task<IActionResult> Delete(string RoleName)
         {
             var result = await _roleservice.DeleteRole(RoleName);
