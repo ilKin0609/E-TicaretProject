@@ -217,9 +217,9 @@ public class OrderService : IOrderService
 
                 Items: order.Items.Select(i => new OrderItemGetDto(
                     ProductId: i.ProductId,
-                    Tittle: i.Product.Tittle,
+                    Tittle: i.Product?.Tittle ?? "Unknown",
                     OrderCount: i.OrderCount,
-                    FirstPrice: i.Product.Price
+                    FirstPrice: i.Product?.Price ?? 0
                     )).ToList()
                 ));
         }

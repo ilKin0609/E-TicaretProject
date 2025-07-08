@@ -12,7 +12,7 @@ public record UserAbout(
     string FullName,
     string Email,
     string? ProfileImageUrl,
-    RoleEnum Role,
+    RoleAdminEnum Role,
     List<OrderGetDto>? Buyers,
     List<ProductGetDto>? Sellers,
     List<FavoriteGetDto>? Favorites

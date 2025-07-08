@@ -134,10 +134,10 @@ public class UserAuthenticationService : IUserAuthenticationService
         FullName: user.FullName,
         Email: user.Email,
         ProfileImageUrl: user.ProfileImageUrl,
-        Role: Enum.Parse<RoleEnum>(roleName),
-        Buyers: orders.Data,
-        Sellers: products.Data,
-        Favorites: favorites.Data
+        Role: Enum.Parse<RoleAdminEnum>(roleName),
+        Buyers: null,
+        Sellers: null,
+        Favorites: null
     );
        return new("Success",response,HttpStatusCode.OK); 
 
@@ -200,8 +200,8 @@ public class UserAuthenticationService : IUserAuthenticationService
 
         if (user is null)
             return new("User not existed", HttpStatusCode.NotFound);
-
-        var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
+        var decodedToken = HttpUtility.UrlDecode(dto.Token);
+        var result = await _userManager.ResetPasswordAsync(user, decodedToken, dto.NewPassword);
 
         if (!result.Succeeded)
         {

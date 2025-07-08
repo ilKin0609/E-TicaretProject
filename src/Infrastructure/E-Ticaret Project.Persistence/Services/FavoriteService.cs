@@ -32,6 +32,9 @@ public class FavoriteService : IFavoriteService
         )
         .ToListAsync();
 
+        if (!favorites.Any())
+            return new("No favorite product found", HttpStatusCode.NotFound);
+
         var favoriteDtos = new List<FavoriteGetDto>();
 
         foreach (var f in favorites)

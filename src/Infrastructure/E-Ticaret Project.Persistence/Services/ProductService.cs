@@ -240,11 +240,17 @@ public class ProductService : IProductService
                 await formFile.CopyToAsync(stream);
             }
 
-            product.Images.Add(new Image
+            productImages.Add(new Image
             {
                 Image_Url = $"/images/{fileName}"
             });
         }
+        if (product.Images == null)
+            product.Images = new List<Image>();
+
+        foreach (var image in productImages)
+            product.Images.Add(image);
+
         _productRepository.Update(product);
         await _productRepository.SaveChangeAsync();
 
@@ -357,7 +363,7 @@ public class ProductService : IProductService
     {
         var products = await _productRepository
         .GetAllFiltered(
-            predicate: p => p.Tittle == Title,
+            predicate: p => p.Tittle.ToLower().Contains(Title.ToLower()),
             include: [p => p.Images]
         )
         .ToListAsync();
