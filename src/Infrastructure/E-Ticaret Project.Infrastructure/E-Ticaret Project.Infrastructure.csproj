@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
+    <ProjectReference Include="..\..\Core\E-Ticaret Project.Application\E-Ticaret Project.Application.csproj" />
   </ItemGroup>
 
 </Project>
