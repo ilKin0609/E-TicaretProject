@@ -1,6 +1,8 @@
 ﻿using E_Ticaret_Project.Application.Abstracts.Services;
+using E_Ticaret_Project.Application.DTOs.FavoriteDtos;
 using E_Ticaret_Project.Application.DTOs.ProductDtos;
 using E_Ticaret_Project.Application.Shared.Responses;
+using E_Ticaret_Project.Persistence.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -92,6 +94,27 @@ namespace E_Ticaret_Project.WebApi.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
+        [HttpPost]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> AddProductFavorite([FromBody] FavoriteCreateDto dto)
+        {
+            var result = await _productService.AddProductFavorite(dto);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> AddProductImage([FromBody] Guid productId, [FromForm] List<IFormFile> images)
+        {
+            var result = await _productService.AddProductImage(productId,images);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
         // PUT api/<ProductsController>/5
         [HttpPut]
         [ProducesResponseType(typeof(BaseResponse<ProductUpdateDto>), (int)HttpStatusCode.OK)]
@@ -111,6 +134,26 @@ namespace E_Ticaret_Project.WebApi.Controllers
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
             var result = await _productService.DeleteProduct(id);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> RemoveProductFavorite(Guid id)
+        {
+            var result = await _productService.RemoveProductFavorite(id);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpDelete("{imageId}")]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> RemoveProductImage(Guid imageId)
+        {
+            var result = await _productService.RemoveProductImage(imageId);
             return StatusCode((int)result.StatusCode, result);
         }
     }

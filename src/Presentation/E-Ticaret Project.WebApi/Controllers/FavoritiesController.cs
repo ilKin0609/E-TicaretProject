@@ -21,32 +21,11 @@ namespace E_Ticaret_Project.WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(BaseResponse<List<FavoriteGetDto>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> MyFavorites(string userId)
+        public async Task<IActionResult> MyFavorites([FromQuery] string userId)
         {
             var favorites=await _favoriteService.MyFavorities(userId);
             return StatusCode((int)favorites.StatusCode, favorites);
         }
 
-        // POST api/<FavoritiesController>
-        [HttpPost]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> AddFavorite([FromBody] FavoriteCreateDto dto)
-        {
-            var result=await _favoriteService.AddFavorite(dto);
-            return StatusCode((int)result.StatusCode,result);
-        }
-
-        // DELETE api/<FavoritiesController>/5
-        [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RemoveFavorite(Guid id)
-        {
-            var result = await _favoriteService.RemoveFavorite(id);
-            return StatusCode((int)result.StatusCode, result);
-        }
     }
 }

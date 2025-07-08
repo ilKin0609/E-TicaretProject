@@ -3,11 +3,10 @@ using E_Ticaret_Project.Domain.Entities;
 using E_Ticaret_Project.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace E_Ticaret_Project.Persistence.Repositories;
 
-public class GenericRepository<T>:IRepository<T> where T : BaseEntity, new()
+public class GenericRepository<T> : IRepository<T> where T : BaseEntity, new()
 {
     protected readonly E_TicaretProjectDbContext _context;
     protected readonly DbSet<T> Table;
@@ -32,54 +31,30 @@ public class GenericRepository<T>:IRepository<T> where T : BaseEntity, new()
 
     public void Delete(T entity)
     {
-        Table.Remove(entity);
+        entity.IsDeleted = true;
+        Update(entity);
     }
 
     public async Task<T?> GetByIdAsync(Guid id)
     {
-        return await Table.FindAsync(id);
+        return await Table.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
     }
 
     public IQueryable<T> GetAll(bool isTracking = false)
     {
-        IQueryable<T> query = Table;
+        IQueryable<T> query = Table.Where(e => !e.IsDeleted);
 
-        if(!isTracking)
-            query=query.AsNoTracking();
-
-        return query;
-    }
-
-    public IQueryable<T> GetByIdFiltered(Expression<Func<T, bool>>? predicate=null,
-        Expression<Func<T, object>>[]? include = null,
-        bool isTracking = false)
-    {
-        IQueryable<T> query = Table;
-
-        if(predicate is not null)
-            query = query.Where(predicate);
-
-        if(include is not null)
-        {
-            foreach (var IncProp in include)
-            {
-                query = query.Include(IncProp);
-            }
-        }
-
-        if(!isTracking)
+        if (!isTracking)
             query = query.AsNoTracking();
 
         return query;
     }
 
-    public IQueryable<T> GetAllFiltered(Expression<Func<T, bool>>? predicate=null,
-        Expression<Func<T, object>>[]? include=null,
-        Expression<Func<T, object>>? OrderBy=null,
-        bool isOrderBy = true,
+    public IQueryable<T> GetByIdFiltered(Expression<Func<T, bool>>? predicate = null,
+        Expression<Func<T, object>>[]? include = null,
         bool isTracking = false)
     {
-        IQueryable<T> query = Table;
+        IQueryable<T> query = Table.Where(e => !e.IsDeleted);
 
         if (predicate is not null)
             query = query.Where(predicate);
@@ -92,9 +67,34 @@ public class GenericRepository<T>:IRepository<T> where T : BaseEntity, new()
             }
         }
 
-        if(OrderBy is not null)
+        if (!isTracking)
+            query = query.AsNoTracking();
+
+        return query;
+    }
+
+    public IQueryable<T> GetAllFiltered(Expression<Func<T, bool>>? predicate = null,
+        Expression<Func<T, object>>[]? include = null,
+        Expression<Func<T, object>>? OrderBy = null,
+        bool isOrderBy = true,
+        bool isTracking = false)
+    {
+        IQueryable<T> query = Table.Where(e => !e.IsDeleted);
+
+        if (predicate is not null)
+            query = query.Where(predicate);
+
+        if (include is not null)
         {
-            if(isOrderBy)
+            foreach (var IncProp in include)
+            {
+                query = query.Include(IncProp);
+            }
+        }
+
+        if (OrderBy is not null)
+        {
+            if (isOrderBy)
                 query = query.OrderBy(OrderBy);
 
             else
@@ -109,16 +109,26 @@ public class GenericRepository<T>:IRepository<T> where T : BaseEntity, new()
 
     public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null)
     {
-        
-        if(predicate is not null)
-            return await Table.CountAsync(predicate);
+        IQueryable<T> query = Table.Where(e => !e.IsDeleted);
 
-        return await Table.CountAsync();
+        if (predicate is not null)
+            query = query.Where(predicate);
+
+        return await query.CountAsync();
     }
 
     public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
     {
-        return await Table.AnyAsync(predicate);
+        IQueryable<T> query = Table.Where(e => !e.IsDeleted);
+
+        query = query.Where(predicate);
+
+        return await query.AnyAsync();
+    }
+
+    public void HardDelete(T entity)
+    {
+        Table.Remove(entity);
     }
 
     public async Task SaveChangeAsync()

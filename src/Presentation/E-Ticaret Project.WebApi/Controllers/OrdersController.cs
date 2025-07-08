@@ -43,9 +43,9 @@ namespace E_Ticaret_Project.WebApi.Controllers
         [ProducesResponseType(typeof(BaseResponse<List<OrderGetDto>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetMyOrdersAsync()
+        public async Task<IActionResult> GetMyOrdersAsync([FromQuery] string userId)
         {
-            var result = await _orderService.GetMyOrdersAsync();
+            var result = await _orderService.GetMyOrdersAsync(userId);
             return StatusCode((int)result.StatusCode, result);
         }
 
@@ -77,6 +77,16 @@ namespace E_Ticaret_Project.WebApi.Controllers
         public async Task<IActionResult> CancelOrderAsync(Guid id)
         {
             var result = await _orderService.CancelOrderAsync(id);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpPut("{id},{orderStatus}")]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> UpdateOrderAsync(Guid id, string orderStatus)
+        {
+            var result = await _orderService.UpdateOrderAsync(id,orderStatus);
             return StatusCode((int)result.StatusCode, result);
         }
 

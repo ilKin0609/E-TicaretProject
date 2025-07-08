@@ -44,16 +44,16 @@ public class CategoryService : ICategoryService
         var allCategories = await _categoryRepository.GetAll().ToListAsync();
         var target = allCategories.FirstOrDefault(c => c.Id == id);
 
+        if (!allCategories.Any())
+            return new("Categories not found",HttpStatusCode.NotFound);
+
         if (target is null)
             return new("Category not found", HttpStatusCode.NotFound);
 
-        var visited = new HashSet<Guid>();
 
         void DeleteWithChildren(Guid parentId)
         {
-            if (!visited.Add(parentId))
-                return;
-
+         
             var children = allCategories.Where(c => c.ParentCategoryId == parentId).ToList();
             foreach (var child in children)
                 DeleteWithChildren(child.Id);
@@ -61,11 +61,10 @@ public class CategoryService : ICategoryService
             var toDelete = allCategories.First(c => c.Id == parentId);
             _categoryRepository.Delete(toDelete);
         }
-
         DeleteWithChildren(id);
         await _categoryRepository.SaveChangeAsync();
 
-        return new("Category and related subcategories deleted", HttpStatusCode.OK);
+        return new("Category and related subcategories deleted", true, HttpStatusCode.OK);
     }
 
     public async Task<BaseResponse<string>> UpdateAsync(CategoryUpdateDto dto)

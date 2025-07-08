@@ -6,7 +6,6 @@ using E_Ticaret_Project.Application.Shared.Settings;
 using E_Ticaret_Project.Domain.Entities;
 using E_Ticaret_Project.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,7 +14,6 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
-using static E_Ticaret_Project.Application.Shared.Permissions.Permission;
 
 namespace E_Ticaret_Project.Persistence.Services;
 
@@ -28,6 +26,7 @@ public class UserAuthenticationService : IUserAuthenticationService
     private JWTSettings _jwtSetting { get; }
     private IFavoriteService _favoriteService { get; }
     private IProductService _productService { get; }
+    private IOrderService _orderService { get; }
 
     public UserAuthenticationService(UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
@@ -35,7 +34,8 @@ public class UserAuthenticationService : IUserAuthenticationService
     RoleManager<IdentityRole> roleManager,
     IEmailService mailService,
     IFavoriteService favoriteService,
-    IProductService productService)
+    IProductService productService,
+    IOrderService orderService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -44,6 +44,7 @@ public class UserAuthenticationService : IUserAuthenticationService
         _mailService = mailService;
         _favoriteService = favoriteService;
         _productService = productService;
+        _orderService = orderService;
     }
     public async Task<BaseResponse<string>> Register(UserRegisterDto dto)
     {
@@ -123,9 +124,9 @@ public class UserAuthenticationService : IUserAuthenticationService
         var roles = await _userManager.GetRolesAsync(user);
         var roleName = roles.FirstOrDefault();
 
-        //var orders = await _orderService.GetOrdersByUserId(user.Id);
+        var orders = await _orderService.GetMyOrdersAsync(userId);
         var products = await _productService.GetMyProducts(userId);
-        var favorites = await _favoriteService.MyFavorities(user.Id);
+        var favorites = await _favoriteService.MyFavorities(userId);
 
         var response = new UserAbout(
         Token: token,
@@ -134,7 +135,7 @@ public class UserAuthenticationService : IUserAuthenticationService
         Email: user.Email,
         ProfileImageUrl: user.ProfileImageUrl,
         Role: Enum.Parse<RoleEnum>(roleName),
-        Buyers: null,
+        Buyers: orders.Data,
         Sellers: products.Data,
         Favorites: favorites.Data
     );

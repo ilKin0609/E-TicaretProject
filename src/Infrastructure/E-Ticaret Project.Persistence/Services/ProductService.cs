@@ -1,9 +1,11 @@
 ﻿using E_Ticaret_Project.Application.Abstracts.Repositories;
 using E_Ticaret_Project.Application.Abstracts.Services;
+using E_Ticaret_Project.Application.DTOs.FavoriteDtos;
 using E_Ticaret_Project.Application.DTOs.ProductDtos;
 using E_Ticaret_Project.Application.Shared;
 using E_Ticaret_Project.Application.Shared.Responses;
 using E_Ticaret_Project.Domain.Entities;
+using E_Ticaret_Project.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -15,15 +17,18 @@ public class ProductService : IProductService
     private IProductRepository _productRepository { get; }
     private ICategoryRepository _categoryRepository { get; }
     private IHttpContextAccessor _httpContext { get; }
+    private IFavoriteRepository _favoriteRepository { get; }
 
     public ProductService(IProductRepository productRepository,
         ICategoryRepository categoryRepository,
-        IHttpContextAccessor httpContext
+        IHttpContextAccessor httpContext,
+        IFavoriteRepository favoriteRepository
         )
     {
         _productRepository = productRepository;
         _categoryRepository = categoryRepository;
         _httpContext = httpContext;
+        _favoriteRepository = favoriteRepository;
     }
 
     public async Task<BaseResponse<string>> CreateProduct(ProductCreateDto dto)
@@ -192,7 +197,107 @@ public class ProductService : IProductService
 
         _productRepository.Delete(product);
         await _productRepository.SaveChangeAsync();
-        return new("Product deleted successfully", HttpStatusCode.OK);
+        return new("Product deleted successfully", true, HttpStatusCode.OK);
+    }
+
+    public async Task<BaseResponse<string>> AddProductImage(Guid productId, List<IFormFile> images)
+    {
+        var product = await _productRepository.GetByIdAsync(productId);
+
+        if (product is null)
+            return new("Product is not found", HttpStatusCode.NotFound);
+
+        if (images is null)
+            return new("Please insert photo", HttpStatusCode.BadRequest);
+
+        List<Image> productImages = new();
+
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+        var maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+
+        var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+
+        if (!Directory.Exists(imagesFolder))
+            Directory.CreateDirectory(imagesFolder);
+
+        foreach (var formFile in images)
+        {
+            var fileExtension = Path.GetExtension(formFile.FileName).ToLower();
+
+            // Fayl tipi yoxla
+            if (!allowedExtensions.Contains(fileExtension))
+                return new($"Invalid file type: {fileExtension}. Only .jpg, .jpeg, .png allowed.", HttpStatusCode.BadRequest);
+
+            // Fayl ölçüsü yoxla
+            if (formFile.Length > maxSizeInBytes)
+                return new($"File size exceeded. Max allowed size is 5 MB.", HttpStatusCode.BadRequest);
+
+            var fileName = Guid.NewGuid().ToString() + fileExtension;
+            var filePath = Path.Combine(imagesFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await formFile.CopyToAsync(stream);
+            }
+
+            product.Images.Add(new Image
+            {
+                Image_Url = $"/images/{fileName}"
+            });
+        }
+        _productRepository.Update(product);
+        await _productRepository.SaveChangeAsync();
+
+        return new("Images successfully added",true,HttpStatusCode.OK);
+    }
+
+    public async Task<BaseResponse<string>> RemoveProductImage(Guid imageId)
+    {
+        var image=await _productRepository.GetImageByIdAsync(imageId);
+
+        if(image is null)
+            return new("Image is not found",HttpStatusCode.NotFound);
+
+        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", image.Image_Url.TrimStart('/'));
+
+        if (File.Exists(fullPath))
+            File.Delete(fullPath);
+
+         _productRepository.DeleteAsync(image);
+        await _productRepository.SaveChangeAsync();
+        return new("Image successfully deleted", true, HttpStatusCode.OK);
+    }
+
+    public async Task<BaseResponse<string>> AddProductFavorite(FavoriteCreateDto dto)
+    {
+        var alreadyFavorite = await _favoriteRepository.AnyAsync(f =>
+            f.ProductId == dto.ProductId && f.UserId == dto.UserId);
+
+        if (alreadyFavorite)
+            return new("Already favorite", HttpStatusCode.BadRequest);
+
+        var favorite = new Favorite
+        {
+            ProductId = dto.ProductId,
+            UserId = dto.UserId
+        };
+
+        await _favoriteRepository.AddAsync(favorite);
+        await _favoriteRepository.SaveChangeAsync();
+
+        return new("Product added to favorites", HttpStatusCode.Created);
+    }
+
+    public async Task<BaseResponse<string>> RemoveProductFavorite(Guid Id)
+    {
+        var favorite = await _favoriteRepository.GetByIdAsync(Id);
+        if (favorite is null)
+            return new("Favorite not found", HttpStatusCode.NotFound);
+
+        _favoriteRepository.Delete(favorite);
+        await _favoriteRepository.SaveChangeAsync();
+
+        return new("Favorite deleted successfully", HttpStatusCode.OK);
     }
 
     public async Task<BaseResponse<List<ProductGetDto>>> GetAllProduct()
@@ -283,7 +388,7 @@ public class ProductService : IProductService
 
     public async Task<BaseResponse<List<ProductGetDto>>> GetMyProducts(string userId)
     {
-        
+
 
         var products = await _productRepository.GetAllFiltered(
             predicate: p => p.OwnerId == userId,
@@ -293,12 +398,12 @@ public class ProductService : IProductService
                         p => p.Comments
                      ]
             ).ToListAsync();
-        if(!products.Any())
+        if (!products.Any())
             return new("You have not added any products yet.", HttpStatusCode.NotFound);
 
-        var MyProducts= new List<ProductGetDto>();
+        var MyProducts = new List<ProductGetDto>();
 
-        foreach(var product in products)
+        foreach (var product in products)
         {
             MyProducts.Add(new ProductGetDto(
                     Id: product.Id,
@@ -313,18 +418,18 @@ public class ProductService : IProductService
                     ImageUrls: product.Images?.Select(img => img.Image_Url).ToList()
                 ));
         }
-        return new("All your products",MyProducts, HttpStatusCode.OK);
+        return new("All your products", MyProducts, HttpStatusCode.OK);
     }
 
     public async Task<BaseResponse<List<ProductGetDto>>> GetDiscountProducts()
     {
         var discountProducts = await _productRepository.GetAllFiltered(
-            predicate:p=>p.Discount>0,
+            predicate: p => p.Discount > 0,
              include: [p => p.Images]
             ).ToListAsync();
 
-        if(!discountProducts.Any())
-            return new("There are no discounted products.",HttpStatusCode.NotFound);
+        if (!discountProducts.Any())
+            return new("There are no discounted products.", HttpStatusCode.NotFound);
 
         var products = new List<ProductGetDto>();
         foreach (var product in discountProducts)
@@ -342,14 +447,14 @@ public class ProductService : IProductService
                     ImageUrls: product.Images?.Select(img => img.Image_Url).ToList())
                 );
         }
-        return new("All discount products",products, HttpStatusCode.OK);
+        return new("All discount products", products, HttpStatusCode.OK);
     }
 
     public async Task<BaseResponse<List<ProductGetDto>>> GetByCategoryProducts(Guid categoryId)
     {
         var allCategories = await _categoryRepository.GetAll().ToListAsync();
         if (!allCategories.Any())
-            return new("Categories not found",HttpStatusCode.NotFound);
+            return new("Categories not found", HttpStatusCode.NotFound);
 
         var categoryIds = GetAllSubCategoryIds(allCategories, categoryId);
 
@@ -365,7 +470,7 @@ public class ProductService : IProductService
         if (!products.Any())
             return new("No products found for this category.", HttpStatusCode.NotFound);
 
-        var productDtos=new List<ProductGetDto>();
+        var productDtos = new List<ProductGetDto>();
 
         foreach (var product in products)
         {
@@ -382,7 +487,7 @@ public class ProductService : IProductService
                     ImageUrls: product.Images?.Select(img => img.Image_Url).ToList()
                 ));
         }
-        return new("All products",productDtos,HttpStatusCode.OK);
+        return new("All products", productDtos, HttpStatusCode.OK);
     }
 
 

@@ -7,4 +7,5 @@ public class BaseEntity
     public DateTime CreatedAt{ get; set; }
     public Guid? UpdatedUser{ get; set; }
     public DateTime? UpdatedAt{ get; set; }
+    public bool IsDeleted { get; set; } = false;
 }

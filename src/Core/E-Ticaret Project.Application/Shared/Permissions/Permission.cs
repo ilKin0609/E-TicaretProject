@@ -4,20 +4,17 @@ public static class Permission
 {
     public static class Category
     {
-        public const string MainCreate = "Category.MainCreate";
-        public const string SubCreate = "Category.SubCreate";
+        public const string Create = "Category.Create";
         public const string Update = "Category.Update";
         public const string Delete = "Category.Delete";
 
         public static List<string> All = new()
         {
-            MainCreate,
-            SubCreate,
+            Create,
             Update,
             Delete
         };
     }
-
     public static class Order
     {
         public const string Create = "Order.Create";
@@ -66,11 +63,23 @@ public static class Permission
     {
         public const string Create = "ReviewAndComment.Create";
         public const string Delete = "ReviewAndComment.Delete";
+        public const string GetByProductId = "ReviewAndComment.GetByProductId";
 
         public static List<string> All = new()
         {
             Create,
-            Delete
+            Delete,
+            GetByProductId
+        };
+    }
+    public static class Favorite
+    {
+        
+        public const string GetFavProducts = "Favorite.GetFavProducts";
+
+        public static List<string> All = new()
+        {
+           GetFavProducts
         };
     }
     public static class Role
@@ -104,7 +113,6 @@ public static class Permission
            GetUser
         };
     }
-
     public static class User
     {
         public const string ResetPassword = "User.ResetPassword";

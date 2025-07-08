@@ -44,7 +44,7 @@ public class OrderService : IOrderService
         _orderRepository.Update(order);
         await _orderRepository.SaveChangeAsync();
 
-        return new("Order cancelled", HttpStatusCode.OK);
+        return new("Order cancelled",true, HttpStatusCode.OK);
     }
 
     public async Task<BaseResponse<string>> CreateOrder(OrderCreateDto dto)
@@ -109,7 +109,20 @@ public class OrderService : IOrderService
             body: htmlBody
             );
 
-        return new("Order Created", HttpStatusCode.Created);
+        return new("Order Created",true, HttpStatusCode.Created);
+    }
+
+    public async Task<BaseResponse<string>> UpdateOrderAsync(Guid id,string orderStatus)
+    {
+        var order = await _orderRepository.GetByIdAsync(id);
+        if (order is null)
+            return new("Order not found", HttpStatusCode.NotFound);
+
+        order.OrderStatus = (OrderStatusEnum)Enum.Parse(typeof(OrderStatusEnum), orderStatus);
+        _orderRepository.Update(order);
+        await _orderRepository.SaveChangeAsync();
+
+        return new("Order updated", true, HttpStatusCode.OK);
     }
 
     public async Task<BaseResponse<List<OrderGetDto>>> GetAllAsync()
@@ -177,9 +190,8 @@ public class OrderService : IOrderService
         return new("Order found", dto, HttpStatusCode.OK);
     }
 
-    public async Task<BaseResponse<List<OrderGetDto>>> GetMyOrdersAsync()
+    public async Task<BaseResponse<List<OrderGetDto>>> GetMyOrdersAsync(string userId)
     {
-        var userId = CurrentUserHelper.GetUserId(_httpContextAccessor.HttpContext);
 
         var orders = await _orderRepository.GetAllFiltered(
             o => o.BuyerId == userId,
@@ -265,7 +277,7 @@ public class OrderService : IOrderService
         _orderRepository.Update(order);
         await _orderRepository.SaveChangeAsync();
 
-        return new("Order confirmed successfully", HttpStatusCode.OK);
+        return new("Order confirmed successfully",true, HttpStatusCode.OK);
     }
 
 }
