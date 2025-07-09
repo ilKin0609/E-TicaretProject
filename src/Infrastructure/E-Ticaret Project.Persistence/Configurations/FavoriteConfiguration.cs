@@ -8,7 +8,10 @@ public class FavoriteConfiguration : IEntityTypeConfiguration<Favorite>
 {
     public void Configure(EntityTypeBuilder<Favorite> builder)
     {
-        builder.HasKey(F => new { F.UserId, F.ProductId });
+        builder.HasKey(f => f.Id); 
+
+        builder.HasIndex(f => new { f.UserId, f.ProductId })
+               .IsUnique();
 
         builder.HasOne(F => F.Product)
             .WithMany(F => F.Favorites)

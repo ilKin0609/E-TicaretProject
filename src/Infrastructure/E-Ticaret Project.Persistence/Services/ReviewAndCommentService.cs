@@ -12,10 +12,12 @@ namespace E_Ticaret_Project.Persistence.Services;
 public class ReviewAndCommentService : IReviewAndCommentService
 {
     private IReviewAndCommentRepository _commentRepository { get; }
+    private IProductRepository _productRepository { get; }
 
-    public ReviewAndCommentService(IReviewAndCommentRepository commentRepository)
+    public ReviewAndCommentService(IReviewAndCommentRepository commentRepository,IProductRepository productRepository)
     {
         _commentRepository = commentRepository;
+        _productRepository = productRepository;
     }
 
     public async Task<BaseResponse<string>> AddComment(ReviewAndCommentCreateDto dto)
@@ -30,7 +32,7 @@ public class ReviewAndCommentService : IReviewAndCommentService
         await _commentRepository.AddAsync(comment);
         await _commentRepository.SaveChangeAsync();
 
-        return new("Comment added", HttpStatusCode.Created);
+        return new("Comment added",true, HttpStatusCode.Created);
     }
 
     public async Task<BaseResponse<string>> RemoveComment(Guid id)
@@ -42,11 +44,15 @@ public class ReviewAndCommentService : IReviewAndCommentService
         _commentRepository.Delete(comment);
         await _commentRepository.SaveChangeAsync();
 
-        return new("Comment is deleted", HttpStatusCode.OK);
+        return new("Comment is deleted",true, HttpStatusCode.OK);
     }
 
     public async Task<BaseResponse<List<ReviewAndCommentGetDto>>> GetByProductIdAsync(Guid productId)
     {
+        var product = await _productRepository.GetByIdAsync(productId);
+        if (product is null)
+            return new("Product is not found", HttpStatusCode.NotFound);
+
         var comments = await _commentRepository
        .GetAllFiltered(
            predicate: rc => rc.ProductId == productId,
@@ -55,7 +61,7 @@ public class ReviewAndCommentService : IReviewAndCommentService
            ])
        .ToListAsync();
 
-        if (comments is null)
+        if (!comments.Any())
             return new("No comments found for this product.", HttpStatusCode.NotFound);
 
         var commentDtos = comments.Select(c =>new ReviewAndCommentGetDto(

@@ -51,7 +51,7 @@ public class OrderService : IOrderService
     {
         var userId = CurrentUserHelper.GetUserId(_httpContextAccessor.HttpContext);
 
-        var newOrder = new Domain.Entities.Order
+        var newOrder = new Order
         {
             BuyerId = userId,
             OrderDate = DateTime.UtcNow,
@@ -68,6 +68,14 @@ public class OrderService : IOrderService
             var product = await _productRepository.GetByIdAsync(item.ProductId);
             if (product is null)
                 return new("Product not found", HttpStatusCode.NotFound);
+
+            if (product.Stock == 0)
+                return new("Product is over", HttpStatusCode.BadRequest);
+
+            if(product.Stock - item.OrderCount<0)
+                return new("The requested quantity exceeds the available stock.",HttpStatusCode.BadRequest);
+
+            product.Stock -= item.OrderCount;
 
             newOrder.Items.Add(new OrderItem
             {
@@ -125,17 +133,32 @@ public class OrderService : IOrderService
         return new("Order updated", true, HttpStatusCode.OK);
     }
 
+    
     public async Task<BaseResponse<List<OrderGetDto>>> GetAllAsync()
     {
-        var orders = await _orderRepository.GetAllFiltered(
-            include: [o => o.Items, o => o.Items.Select(i => i.Product)]
+        var orders = await _orderRepository.GetAllOrderFiltered(
+            include: query => query
+            .Include(o => o.Items)
+            .ThenInclude(i => i.Product)
         ).ToListAsync();
+
+        if (!orders.Any())
+            return new("No orders found", HttpStatusCode.NotFound);
 
         var result = new List<OrderGetDto>();
 
         foreach (var order in orders)
         {
-            result.Add(new OrderGetDto(
+            var validItems = order.Items
+                .Where(i => i.Product is not null && !i.Product.IsDeleted)
+                .Select(i => new OrderItemGetDto(
+                    ProductId: i.ProductId,
+                    Tittle: i.Product.Tittle,
+                    OrderCount: i.OrderCount,
+                    FirstPrice: i.FirstPrice 
+                )).ToList();
+
+            var orderDto = new OrderGetDto(
                 Id: order.Id,
                 OrderStatus: order.OrderStatus,
                 OrderDate: order.OrderDate,
@@ -145,14 +168,10 @@ public class OrderService : IOrderService
                 ShoppingAddress: order.ShoppingAddress,
                 TotalPrice: order.TotalPrice,
                 BuyerId: order.BuyerId,
+                Items: validItems
+            );
 
-                Items: order.Items.Select(i => new OrderItemGetDto(
-                    ProductId: i.ProductId,
-                    Tittle: i.Product.Tittle,
-                    OrderCount: i.OrderCount,
-                    FirstPrice: i.Product.Price
-                    )).ToList()
-                ));
+            result.Add(orderDto);
         }
 
         return new("All orders", result, HttpStatusCode.OK);
@@ -160,9 +179,11 @@ public class OrderService : IOrderService
 
     public async Task<BaseResponse<OrderGetDto>> GetByIdAsync(Guid id)
     {
-        var order = await _orderRepository.GetByIdFiltered(
+        var order = await _orderRepository.GetOrderByIdFiltered(
             predicate: o => o.Id == id,
-            include: [o => o.Items, o => o.Items.Select(i => i.Product)]
+            include: query => query
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product)
          ).FirstOrDefaultAsync();
 
         if (order is null)
@@ -193,10 +214,12 @@ public class OrderService : IOrderService
     public async Task<BaseResponse<List<OrderGetDto>>> GetMyOrdersAsync(string userId)
     {
 
-        var orders = await _orderRepository.GetAllFiltered(
-            o => o.BuyerId == userId,
-            include: [o => o.Items, o => o.Items.Select(i => i.Product)]
-        ).ToListAsync();
+        var orders = await _orderRepository.GetAllOrderFiltered(
+            predicate:o => o.BuyerId == userId,
+            include: query => query
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product)
+            ).ToListAsync();
 
         if (!orders.Any())
             return new("You haven't placed any orders.", HttpStatusCode.NotFound);
@@ -230,10 +253,12 @@ public class OrderService : IOrderService
     {
         var sellerId = CurrentUserHelper.GetUserId(_httpContextAccessor.HttpContext);
 
-        var orders = await _orderRepository.GetAllFiltered(
-            o => o.Items.Any(i => i.Product.OwnerId == sellerId),
-            include: [o => o.Items, o => o.Items.Select(i => i.Product)]
-        ).ToListAsync();
+        var orders = await _orderRepository.GetAllOrderFiltered(
+            predicate: o => o.Items.Any(i => i.Product.OwnerId == sellerId),
+            include: query => query
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product)
+            ).ToListAsync();
 
         var result = new List<OrderGetDto>();
 

@@ -126,7 +126,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         [ProducesResponseType(typeof(BaseResponse<ProductUpdateDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> UpdateProduct([FromBody] ProductUpdateDto dto)
+        public async Task<IActionResult> UpdateProduct([FromForm] ProductUpdateDto dto)
         {
             var result = await _productService.UpdateProduct(dto);
             return StatusCode((int)result.StatusCode, result);

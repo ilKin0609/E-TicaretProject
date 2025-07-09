@@ -124,20 +124,13 @@ public class UserAuthenticationService : IUserAuthenticationService
         var roles = await _userManager.GetRolesAsync(user);
         var roleName = roles.FirstOrDefault();
 
-        var orders = await _orderService.GetMyOrdersAsync(userId);
-        var products = await _productService.GetMyProducts(userId);
-        var favorites = await _favoriteService.MyFavorities(userId);
-
         var response = new UserAbout(
         Token: token,
         Id: user.Id,
         FullName: user.FullName,
         Email: user.Email,
         ProfileImageUrl: user.ProfileImageUrl,
-        Role: Enum.Parse<RoleAdminEnum>(roleName),
-        Buyers: null,
-        Sellers: null,
-        Favorites: null
+        Role: Enum.Parse<RoleAdminEnum>(roleName)
     );
        return new("Success",response,HttpStatusCode.OK); 
 

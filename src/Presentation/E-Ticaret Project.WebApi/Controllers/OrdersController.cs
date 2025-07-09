@@ -23,6 +23,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         [HttpGet]
         [Authorize(Policy = "Order.GetAll")]
         [ProducesResponseType(typeof(BaseResponse<List<OrderGetDto>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetAllAsync()
         {

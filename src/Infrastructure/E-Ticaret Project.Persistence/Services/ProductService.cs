@@ -5,7 +5,6 @@ using E_Ticaret_Project.Application.DTOs.ProductDtos;
 using E_Ticaret_Project.Application.Shared;
 using E_Ticaret_Project.Application.Shared.Responses;
 using E_Ticaret_Project.Domain.Entities;
-using E_Ticaret_Project.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -155,6 +154,9 @@ public class ProductService : IProductService
                     await formFile.CopyToAsync(stream);
                 }
 
+                if (product.Images == null)
+                    product.Images = new List<Image>();
+
                 product.Images.Add(new Image
                 {
                     Image_Url = $"/images/{fileName}"
@@ -254,28 +256,32 @@ public class ProductService : IProductService
         _productRepository.Update(product);
         await _productRepository.SaveChangeAsync();
 
-        return new("Images successfully added",true,HttpStatusCode.OK);
+        return new("Images successfully added", true, HttpStatusCode.OK);
     }
 
     public async Task<BaseResponse<string>> RemoveProductImage(Guid imageId)
     {
-        var image=await _productRepository.GetImageByIdAsync(imageId);
+        var image = await _productRepository.GetImageByIdAsync(imageId);
 
-        if(image is null)
-            return new("Image is not found",HttpStatusCode.NotFound);
+        if (image is null)
+            return new("Image is not found", HttpStatusCode.NotFound);
 
         var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", image.Image_Url.TrimStart('/'));
 
         if (File.Exists(fullPath))
             File.Delete(fullPath);
 
-         _productRepository.DeleteAsync(image);
+        _productRepository.DeleteAsync(image);
         await _productRepository.SaveChangeAsync();
         return new("Image successfully deleted", true, HttpStatusCode.OK);
     }
 
     public async Task<BaseResponse<string>> AddProductFavorite(FavoriteCreateDto dto)
     {
+        var product = await _productRepository.GetByIdAsync(dto.ProductId);
+        if (product is null)
+            return new("Product is not found", HttpStatusCode.NotFound);
+
         var alreadyFavorite = await _favoriteRepository.AnyAsync(f =>
             f.ProductId == dto.ProductId && f.UserId == dto.UserId);
 
@@ -284,6 +290,7 @@ public class ProductService : IProductService
 
         var favorite = new Favorite
         {
+
             ProductId = dto.ProductId,
             UserId = dto.UserId
         };
@@ -291,7 +298,7 @@ public class ProductService : IProductService
         await _favoriteRepository.AddAsync(favorite);
         await _favoriteRepository.SaveChangeAsync();
 
-        return new("Product added to favorites", HttpStatusCode.Created);
+        return new("Product added to favorites", true, HttpStatusCode.Created);
     }
 
     public async Task<BaseResponse<string>> RemoveProductFavorite(Guid Id)
@@ -303,7 +310,7 @@ public class ProductService : IProductService
         _favoriteRepository.Delete(favorite);
         await _favoriteRepository.SaveChangeAsync();
 
-        return new("Favorite deleted successfully", HttpStatusCode.OK);
+        return new("Favorite deleted successfully", true, HttpStatusCode.OK);
     }
 
     public async Task<BaseResponse<List<ProductGetDto>>> GetAllProduct()
@@ -325,7 +332,9 @@ public class ProductService : IProductService
             Stock: p.Stock,
             CategoryId: p.CategoryId,
             OwnerId: p.OwnerId,
-            ImageUrls: p.Images?.Select(img => img.Image_Url).ToList()
+            ImageUrls: p.Images?.Where(img => !img.IsDeleted)
+            .Select(img => img.Image_Url)
+            .ToList()
         )).ToList();
 
         return new("All products", productDtos, HttpStatusCode.OK);
@@ -351,7 +360,10 @@ public class ProductService : IProductService
             Stock: product.Stock,
             CategoryId: product.CategoryId,
             OwnerId: product.OwnerId,
-            ImageUrls: product.Images?.Select(img => img.Image_Url).ToList()
+            ImageUrls: product.Images
+            ?.Where(img => !img.IsDeleted)
+            .Select(img => img.Image_Url)
+            .ToList()
             );
 
         return new("product found", productDto, HttpStatusCode.OK);
@@ -385,7 +397,10 @@ public class ProductService : IProductService
                 Stock: product.Stock,
                 CategoryId: product.CategoryId,
                 OwnerId: product.OwnerId,
-                ImageUrls: product.Images?.Select(img => img.Image_Url).ToList()
+                ImageUrls: product.Images
+            ?.Where(img => !img.IsDeleted)
+            .Select(img => img.Image_Url)
+            .ToList()
              ));
         }
 
@@ -421,7 +436,10 @@ public class ProductService : IProductService
                     Stock: product.Stock,
                     CategoryId: product.CategoryId,
                     OwnerId: product.OwnerId,
-                    ImageUrls: product.Images?.Select(img => img.Image_Url).ToList()
+                    ImageUrls: product.Images
+            ?.Where(img => !img.IsDeleted)
+            .Select(img => img.Image_Url)
+            .ToList()
                 ));
         }
         return new("All your products", MyProducts, HttpStatusCode.OK);
@@ -450,8 +468,11 @@ public class ProductService : IProductService
                     Stock: product.Stock,
                     CategoryId: product.CategoryId,
                     OwnerId: product.OwnerId,
-                    ImageUrls: product.Images?.Select(img => img.Image_Url).ToList())
-                );
+                    ImageUrls: product.Images
+            ?.Where(img => !img.IsDeleted)
+            .Select(img => img.Image_Url)
+            .ToList()
+                ));
         }
         return new("All discount products", products, HttpStatusCode.OK);
     }
@@ -490,7 +511,10 @@ public class ProductService : IProductService
                     Stock: product.Stock,
                     CategoryId: product.CategoryId,
                     OwnerId: product.OwnerId,
-                    ImageUrls: product.Images?.Select(img => img.Image_Url).ToList()
+                    ImageUrls: product.Images
+            ?.Where(img => !img.IsDeleted)
+            .Select(img => img.Image_Url)
+            .ToList()
                 ));
         }
         return new("All products", productDtos, HttpStatusCode.OK);

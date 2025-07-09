@@ -12,8 +12,5 @@ public record UserAbout(
     string FullName,
     string Email,
     string? ProfileImageUrl,
-    RoleAdminEnum Role,
-    List<OrderGetDto>? Buyers,
-    List<ProductGetDto>? Sellers,
-    List<FavoriteGetDto>? Favorites
+    RoleAdminEnum Role
 );
