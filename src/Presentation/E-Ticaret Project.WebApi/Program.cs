@@ -1,3 +1,4 @@
+using CloudinaryDotNet;
 using E_Ticaret_Project.Application.Shared.Permissions;
 using E_Ticaret_Project.Application.Shared.Settings;
 using E_Ticaret_Project.Application.Validations.CategoryValidations;
@@ -10,6 +11,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -81,6 +83,15 @@ builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JWTSettings>();
 
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
+
+builder.Services.AddSingleton<Cloudinary>(provider =>
+{
+    var config = provider.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+    var account = new Account(config.CloudName, config.ApiKey, config.ApiSecret);
+    return new Cloudinary(account);
+});
 builder.Services.AddAuthorization(options =>
 {
 
@@ -130,6 +141,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseStaticFiles();
+//app.UseStaticFiles();
 
 app.Run();

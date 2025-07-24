@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace E_Ticaret_Project.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class RolesController : ControllerBase
     {
@@ -18,12 +18,20 @@ namespace E_Ticaret_Project.WebApi.Controllers
             _roleservice = roleservice;
         }
         // GET: api/<RolesController>
-        [HttpGet("permissions")]
+        [HttpGet]
         [Authorize(Policy = "Role.GetAllPermissions")]
         public IActionResult GetAllPermissions()
         {
             var permissions = PermissionHelper.GetAllPermissions();
             return Ok(permissions);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAllRoles()
+        {
+            var result=await _roleservice.GetAllRoles();
+            return StatusCode((int)result.StatusCode, result);
         }
 
         [HttpGet("{RoleId}")]

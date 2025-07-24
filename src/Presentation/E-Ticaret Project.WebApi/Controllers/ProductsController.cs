@@ -1,4 +1,6 @@
-﻿using E_Ticaret_Project.Application.Abstracts.Services;
+﻿using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.DTOs.FavoriteDtos;
 using E_Ticaret_Project.Application.DTOs.ProductDtos;
 using E_Ticaret_Project.Application.Shared.Responses;
@@ -16,9 +18,11 @@ namespace E_Ticaret_Project.WebApi.Controllers
     public class ProductsController : ControllerBase
     {
         private IProductService _productService { get; }
-        public ProductsController(IProductService productService)
+        private Cloudinary _cloudDinary { get; }
+        public ProductsController(IProductService productService, Cloudinary cloudinary)
         {
             _productService = productService;
+            _cloudDinary = cloudinary;
         }
         // GET: api/<ProductsController>
         [HttpGet]
@@ -165,5 +169,6 @@ namespace E_Ticaret_Project.WebApi.Controllers
             var result = await _productService.RemoveProductImage(imageId);
             return StatusCode((int)result.StatusCode, result);
         }
+
     }
 }

@@ -24,27 +24,18 @@ public class UserAuthenticationService : IUserAuthenticationService
     private IEmailService _mailService { get; }
     private RoleManager<IdentityRole> _roleManager { get; }
     private JWTSettings _jwtSetting { get; }
-    private IFavoriteService _favoriteService { get; }
-    private IProductService _productService { get; }
-    private IOrderService _orderService { get; }
 
     public UserAuthenticationService(UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
     IOptions<JWTSettings> jwtSetting,
     RoleManager<IdentityRole> roleManager,
-    IEmailService mailService,
-    IFavoriteService favoriteService,
-    IProductService productService,
-    IOrderService orderService)
+    IEmailService mailService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtSetting = jwtSetting.Value;
         _roleManager = roleManager;
         _mailService = mailService;
-        _favoriteService = favoriteService;
-        _productService = productService;
-        _orderService = orderService;
     }
     public async Task<BaseResponse<string>> Register(UserRegisterDto dto)
     {
@@ -161,7 +152,8 @@ public class UserAuthenticationService : IUserAuthenticationService
         {
             return new("Email confirmation failed", HttpStatusCode.BadRequest);
         }
-        var result = await _userManager.ConfirmEmailAsync(existedUser, token);
+        var decodeToken=HttpUtility.UrlDecode(token);
+        var result = await _userManager.ConfirmEmailAsync(existedUser, decodeToken);
 
         if (!result.Succeeded)
         {

@@ -3,6 +3,7 @@ using E_Ticaret_Project.Application.DTOs.RoleDtos;
 using E_Ticaret_Project.Application.Shared.Responses;
 using E_Ticaret_Project.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Security.Claims;
 
@@ -19,6 +20,28 @@ public class RoleService:IRoleService
         _userManager = userManager;
     }
 
+    public async Task<BaseResponse<List<RoleGetDto>>> GetAllRoles()
+    {
+        var roles = await _roleManager.Roles.ToListAsync();
+
+        var roleList = new List<RoleGetDto>();
+        foreach(var role in roles)
+        {
+            var claims = await _roleManager.GetClaimsAsync(role);
+            var permissions = claims
+                .Where(c => c.Type == "Permission")
+                .Select(c => c.Value)
+                .ToList();
+
+            roleList.Add(new RoleGetDto
+            {
+                RoleId = role.Id,
+                Name = role.Name,
+                Permissions = permissions
+            });
+        }
+        return new("All roles and their's permissions", roleList, HttpStatusCode.OK);
+    }
     public async Task<BaseResponse<RoleGetDto>> RoleGetByIdAsync(string RoleId)
     {
         var role = await _roleManager.FindByIdAsync(RoleId);

@@ -1,4 +1,6 @@
-﻿using E_Ticaret_Project.Application.Abstracts.Repositories;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using E_Ticaret_Project.Application.Abstracts.Repositories;
 using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.DTOs.FavoriteDtos;
 using E_Ticaret_Project.Application.DTOs.ProductDtos;
@@ -17,17 +19,20 @@ public class ProductService : IProductService
     private ICategoryRepository _categoryRepository { get; }
     private IHttpContextAccessor _httpContext { get; }
     private IFavoriteRepository _favoriteRepository { get; }
+    private Cloudinary _cloudinary { get; }
 
     public ProductService(IProductRepository productRepository,
         ICategoryRepository categoryRepository,
         IHttpContextAccessor httpContext,
-        IFavoriteRepository favoriteRepository
+        IFavoriteRepository favoriteRepository,
+        Cloudinary cloudinary
         )
     {
         _productRepository = productRepository;
         _categoryRepository = categoryRepository;
         _httpContext = httpContext;
         _favoriteRepository = favoriteRepository;
+        _cloudinary = cloudinary;
     }
 
     public async Task<BaseResponse<string>> CreateProduct(ProductCreateDto dto)
@@ -47,10 +52,9 @@ public class ProductService : IProductService
             Discount = dto.Discount,
             Rating = dto.Rating,
             Stock = dto.Stock,
-            CategoryId = dto.CategoryId
+            CategoryId = dto.CategoryId,
+            OwnerId = userId
         };
-
-        newProduct.OwnerId = userId;
 
         List<Image> productImages = new();
 
@@ -58,11 +62,6 @@ public class ProductService : IProductService
         {
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
             var maxSizeInBytes = 5 * 1024 * 1024; // 5MB
-
-            var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
-
-            if (!Directory.Exists(imagesFolder))
-                Directory.CreateDirectory(imagesFolder);
 
             foreach (var formFile in dto.image)
             {
@@ -76,18 +75,30 @@ public class ProductService : IProductService
                 if (formFile.Length > maxSizeInBytes)
                     return new($"File size exceeded. Max allowed size is 5 MB.", HttpStatusCode.BadRequest);
 
-                var fileName = Guid.NewGuid().ToString() + fileExtension;
-                var filePath = Path.Combine(imagesFolder, fileName);
+                await using var stream = formFile.OpenReadStream();
+                stream.Position = 0;
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                var uploadParams = new ImageUploadParams
                 {
-                    await formFile.CopyToAsync(stream);
+                    File = new FileDescription(formFile.FileName, stream),
+                    Folder = "ecommerce-products",
+                    Transformation = new Transformation().Width(500).Height(500).Crop("fill")
+                };
+
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                if (uploadResult.StatusCode == HttpStatusCode.OK)
+                {
+                    productImages.Add(new Image
+                    {
+                        Image_Url = uploadResult.SecureUrl.AbsoluteUri,
+                        PublicId = uploadResult.PublicId
+                    });
                 }
-
-                productImages.Add(new Image
+                else
                 {
-                    Image_Url = $"/images/{fileName}"
-                });
+                    return new("Image upload failed", HttpStatusCode.InternalServerError);
+                }
             }
         }
 
@@ -129,10 +140,6 @@ public class ProductService : IProductService
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
             var maxSizeInBytes = 5 * 1024 * 1024; // 5MB
 
-            var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
-            if (!Directory.Exists(imagesFolder))
-                Directory.CreateDirectory(imagesFolder);
-
             foreach (var formFile in dto.Images)
             {
                 if (string.IsNullOrWhiteSpace(formFile.FileName))
@@ -146,21 +153,32 @@ public class ProductService : IProductService
                 if (formFile.Length > maxSizeInBytes)
                     return new("File size exceeded. Max allowed size is 5 MB.", HttpStatusCode.BadRequest);
 
-                var fileName = Guid.NewGuid().ToString() + extension;
-                var filePath = Path.Combine(imagesFolder, fileName);
+                await using var stream = formFile.OpenReadStream();
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                var uploadParams = new ImageUploadParams
                 {
-                    await formFile.CopyToAsync(stream);
+                    File = new FileDescription(formFile.FileName, stream),
+                    Folder = "ecommerce-products",
+                    Transformation = new Transformation().Width(500).Height(500).Crop("fill")
+                };
+
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    if (product.Images == null)
+                        product.Images = new List<Image>();
+
+                    product.Images.Add(new Image
+                    {
+                        Image_Url = uploadResult.SecureUrl.AbsoluteUri,
+                        PublicId = uploadResult.PublicId
+                    });
                 }
-
-                if (product.Images == null)
-                    product.Images = new List<Image>();
-
-                product.Images.Add(new Image
+                else
                 {
-                    Image_Url = $"/images/{fileName}"
-                });
+                    return new("Image upload failed", HttpStatusCode.InternalServerError);
+                }
             }
         }
 
@@ -172,13 +190,12 @@ public class ProductService : IProductService
 
     public async Task<BaseResponse<string>> DeleteProduct(Guid productId)
     {
-
         var product = await _productRepository
-        .GetByIdFiltered(
-            predicate: p => p.Id == productId,
-            include: [p => p.Images]
-        )
-        .FirstOrDefaultAsync();
+            .GetByIdFiltered(
+                predicate: p => p.Id == productId,
+                include: [p => p.Images]
+            )
+            .FirstOrDefaultAsync();
 
         if (product is null)
             return new("Product not found", HttpStatusCode.NotFound);
@@ -187,18 +204,23 @@ public class ProductService : IProductService
         {
             foreach (var image in product.Images)
             {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", image.Image_Url.TrimStart('/'));
-
-                if (File.Exists(filePath))
+                if (!string.IsNullOrEmpty(image.PublicId))
                 {
-                    File.Delete(filePath);
+                    var deletionParams = new DeletionParams(image.PublicId);
+                    var result = await _cloudinary.DestroyAsync(deletionParams);
+
+                    if (result.Result != "ok" && result.Result != "not found")
+                    {
+                        return new("Failed to delete image from Cloudinary", HttpStatusCode.InternalServerError);
+                    }
+                    _productRepository.DeleteAsync(image);
                 }
             }
         }
 
-
         _productRepository.Delete(product);
         await _productRepository.SaveChangeAsync();
+
         return new("Product deleted successfully", true, HttpStatusCode.OK);
     }
 
@@ -209,55 +231,59 @@ public class ProductService : IProductService
         if (product is null)
             return new("Product is not found", HttpStatusCode.NotFound);
 
-        if (images is null)
+        if (images is null || !images.Any())
             return new("Please insert photo", HttpStatusCode.BadRequest);
-
-        List<Image> productImages = new();
 
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
         var maxSizeInBytes = 5 * 1024 * 1024; // 5MB
 
-        var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
-
-        if (!Directory.Exists(imagesFolder))
-            Directory.CreateDirectory(imagesFolder);
+        List<Image> productImages = new();
 
         foreach (var formFile in images)
         {
-            var fileExtension = Path.GetExtension(formFile.FileName).ToLower();
+            var extension = Path.GetExtension(formFile.FileName).ToLower();
 
-            // Fayl tipi yoxla
-            if (!allowedExtensions.Contains(fileExtension))
-                return new($"Invalid file type: {fileExtension}. Only .jpg, .jpeg, .png allowed.", HttpStatusCode.BadRequest);
+            if (!allowedExtensions.Contains(extension))
+                return new($"Invalid file type: {extension}. Only .jpg, .jpeg, .png allowed.", HttpStatusCode.BadRequest);
 
-            // Fayl ölçüsü yoxla
             if (formFile.Length > maxSizeInBytes)
-                return new($"File size exceeded. Max allowed size is 5 MB.", HttpStatusCode.BadRequest);
+                return new("File size exceeded. Max allowed size is 5 MB.", HttpStatusCode.BadRequest);
 
-            var fileName = Guid.NewGuid().ToString() + fileExtension;
-            var filePath = Path.Combine(imagesFolder, fileName);
+            await using var stream = formFile.OpenReadStream();
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            var uploadParams = new ImageUploadParams
             {
-                await formFile.CopyToAsync(stream);
-            }
+                File = new FileDescription(formFile.FileName, stream),
+                Folder = "ecommerce-products",
+                Transformation = new Transformation().Width(500).Height(500).Crop("fill")
+            };
+
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            if (uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                return new("Image upload failed", HttpStatusCode.InternalServerError);
 
             productImages.Add(new Image
             {
-                Image_Url = $"/images/{fileName}"
+                Image_Url = uploadResult.SecureUrl.AbsoluteUri,
+                PublicId = uploadResult.PublicId
             });
         }
+
         if (product.Images == null)
             product.Images = new List<Image>();
 
         foreach (var image in productImages)
+        {
             product.Images.Add(image);
+        }
 
         _productRepository.Update(product);
         await _productRepository.SaveChangeAsync();
 
         return new("Images successfully added", true, HttpStatusCode.OK);
     }
+
 
     public async Task<BaseResponse<string>> RemoveProductImage(Guid imageId)
     {
@@ -266,10 +292,15 @@ public class ProductService : IProductService
         if (image is null)
             return new("Image is not found", HttpStatusCode.NotFound);
 
-        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", image.Image_Url.TrimStart('/'));
+        if (string.IsNullOrEmpty(image.PublicId))
+            return new("Image PublicId is missing", HttpStatusCode.BadRequest);
 
-        if (File.Exists(fullPath))
-            File.Delete(fullPath);
+        var deletionParams = new DeletionParams(image.PublicId);
+        var result = await _cloudinary.DestroyAsync(deletionParams);
+
+        if (result.Result != "ok")
+            return new("Image could not be deleted from Cloudinary", HttpStatusCode.InternalServerError);
+
 
         _productRepository.DeleteAsync(image);
         await _productRepository.SaveChangeAsync();
@@ -523,7 +554,7 @@ public class ProductService : IProductService
 
 
 
-    private List<Guid> GetAllSubCategoryIds(List<Domain.Entities.Category> allCategories, Guid rootCategoryId)
+    private List<Guid> GetAllSubCategoryIds(List<Category> allCategories, Guid rootCategoryId)
     {
         var result = new List<Guid> { rootCategoryId };
 
