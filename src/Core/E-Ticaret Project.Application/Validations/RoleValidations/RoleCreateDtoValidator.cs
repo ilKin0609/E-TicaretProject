@@ -10,11 +10,7 @@ public class RoleCreateDtoValidator : AbstractValidator<RoleCreateDto>
         RuleFor(r => r.Name)
             .NotEmpty().WithMessage("Role cannot be null")
             .MaximumLength(100).WithMessage("Role name is long");
-
-        RuleForEach(r => r.PermissionList)
-            .NotEmpty().WithMessage("Permission cannot be null")
-            .When(r => r.PermissionList != null);
-        ;
+        
     }
 
 }

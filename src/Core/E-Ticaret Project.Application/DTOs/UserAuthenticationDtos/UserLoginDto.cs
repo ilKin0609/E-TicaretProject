@@ -2,6 +2,6 @@
 
 public record UserLoginDto(
     
-    string Email,
+    string UserName,
     string Password
 );

@@ -19,7 +19,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
         // GET: api/<RolesController>
         [HttpGet]
-        [Authorize(Policy = "Role.GetAllPermissions")]
+        [Authorize(Policy = Permission.Role.GetAllPermissions)]
         public IActionResult GetAllPermissions()
         {
             var permissions = PermissionHelper.GetAllPermissions();
@@ -27,7 +27,6 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetAllRoles()
         {
             var result=await _roleservice.GetAllRoles();
@@ -35,16 +34,15 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpGet("{RoleId}")]
-        [Authorize]
-        public async Task<IActionResult> GetByIdAsync(string RoleId)
+        public async Task<IActionResult> GetByIdAsync([FromRoute] string RoleId)
         {
             var result = await _roleservice.RoleGetByIdAsync(RoleId);
             return StatusCode((int)result.StatusCode, result);
         }
 
         [HttpPost]
-        [Authorize(Policy = "Role.Create")]
-        public async Task<IActionResult> Create(RoleCreateDto dto)
+        [Authorize(Policy = Permission.Role.Create)]
+        public async Task<IActionResult> Create([FromBody] RoleCreateDto dto)
         {
             var result = await _roleservice.CreateRole(dto);
             return StatusCode((int)result.StatusCode, result);
@@ -52,16 +50,16 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
 
         [HttpPut]
-        [Authorize(Policy = "Role.Update")]
-        public async Task<IActionResult> Update(RoleUpdateDto dto)
+        [Authorize(Policy = Permission.Role.Update)]
+        public async Task<IActionResult> Update([FromBody] RoleUpdateDto dto)
         {
             var result = await _roleservice.UpdateRole(dto);
             return StatusCode((int)result.StatusCode, result);
         }
 
         [HttpDelete("{RoleName}")]
-        [Authorize(Policy = "Role.Delete")]
-        public async Task<IActionResult> Delete(string RoleName)
+        [Authorize(Policy = Permission.Role.Delete)]
+        public async Task<IActionResult> Delete([FromRoute] string RoleName)
         {
             var result = await _roleservice.DeleteRole(RoleName);
             return StatusCode((int)result.StatusCode, result);

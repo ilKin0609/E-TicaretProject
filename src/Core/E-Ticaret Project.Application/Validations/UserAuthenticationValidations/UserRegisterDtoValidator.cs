@@ -1,30 +1,39 @@
-﻿using E_Ticaret_Project.Application.DTOs.UserAuthenticationDtos;
+﻿using E_Ticaret_Project.Application.Abstracts.Services;
+using E_Ticaret_Project.Application.DTOs.UserAuthenticationDtos;
 using FluentValidation;
 
 namespace E_Ticaret_Project.Application.Validations.UserAuthenticationValidations;
 
-public class UserRegisterDtoValidator:AbstractValidator<UserRegisterDto>
+public class UserRegisterDtoValidator : AbstractValidator<UserRegisterDto>
 {
-    public UserRegisterDtoValidator()
+    private const string PhonePattern = @"^\+?[0-9\s\-]{7,20}$";
+
+    public UserRegisterDtoValidator(ILocalizationService localizer)
     {
-        RuleFor(U => U.FullName)
-             .NotEmpty().WithMessage("Fullname is required")
-             .MaximumLength(100).WithMessage("Fullname cannot exceed 100 characters");
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage(_ => localizer.Get("User_Name_Required"))
+            .MaximumLength(100).WithMessage(_ => localizer.Get("User_Name_MaxLength"));
 
-        RuleFor(U => U.Email)
-            .NotEmpty().WithMessage("Email is required")
-            .EmailAddress().WithMessage("Invalid email format");
+        
+        RuleFor(x => x.Surname)
+            .NotEmpty().WithMessage(_ => localizer.Get("User_Surname_Required"))
+            .MaximumLength(100).WithMessage(_ => localizer.Get("User_Surname_MaxLength"));
 
-        RuleFor(U => U.Password)
-            .NotEmpty().WithMessage("Password is required")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters")
-            .Matches("[A-Z]").WithMessage("Password must contain at least one uppercase letter")
-            .Matches("[a-z]").WithMessage("Password must contain at least one lowercase letter")
-            .Matches("[0-9]").WithMessage("Password must contain at least one digit")
-            .Matches("[^a-zA-Z0-9]").WithMessage("Password must contain at least one special character");
+        RuleFor(x => x.Company)
+            .NotEmpty().WithMessage(_ => localizer.Get("User_Company_Required"))
+            .MaximumLength(150).WithMessage(_ => localizer.Get("User_Company_MaxLength"));
 
-        RuleFor(U => U.Role)
-           .NotEmpty().WithMessage("Please select role")
-           .IsInEnum().WithMessage("Wrong format");
+        RuleFor(x => x.Duty)
+            .NotEmpty().WithMessage(_ => localizer.Get("User_Duty_Required"))
+            .MaximumLength(100).WithMessage(_ => localizer.Get("User_Duty_MaxLength"));
+
+        RuleFor(x => x.Phone)
+            .NotEmpty().WithMessage(_ => localizer.Get("User_Phone_Required"))
+            .Matches(PhonePattern).WithMessage(_ => localizer.Get("User_Phone_Invalid"));
+
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage(_ => localizer.Get("User_Email_Required"))
+            .EmailAddress().WithMessage(_ => localizer.Get("User_Email_Invalid"))
+            .MaximumLength(200).WithMessage(_ => localizer.Get("User_Email_MaxLength"));
     }
 }

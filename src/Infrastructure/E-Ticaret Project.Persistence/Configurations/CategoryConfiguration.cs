@@ -6,18 +6,39 @@ namespace E_Ticaret_Project.Persistence.Configurations;
 
 public class CategoryConfiguration:IEntityTypeConfiguration<Category>
 {
-    public void Configure(EntityTypeBuilder<Category> builder)
+    public void Configure(EntityTypeBuilder<Category> b)
     {
-        builder.Property(Ct => Ct.Name)
-            .IsRequired()
-            .HasMaxLength(350);
+        b.Property(x => x.NameAz).IsRequired().HasMaxLength(200);
+        b.Property(x => x.NameRu).IsRequired().HasMaxLength(200);
+        b.Property(x => x.NameEn).IsRequired().HasMaxLength(200);
 
-        builder.HasOne(Ct => Ct.ParentCategory)
+        b.Property(x => x.Slug).IsRequired().HasMaxLength(150);
+
+        b.Property(x => x.MetaTitleAz).HasMaxLength(255);
+        b.Property(x => x.MetaTitleRu).HasMaxLength(255);
+        b.Property(x => x.MetaTitleEn).HasMaxLength(255);
+
+        b.Property(x => x.MetaDescriptionAz).HasMaxLength(1000);
+        b.Property(x => x.MetaDescriptionRu).HasMaxLength(1000);
+        b.Property(x => x.MetaDescriptionEn).HasMaxLength(1000);
+
+        b.Property(x => x.Keywords).HasMaxLength(500);
+
+        b.HasIndex(x => x.Slug).IsUnique().HasFilter("[IsDeleted] = 0"); ;
+
+        b.HasIndex(x => new { x.ParentCategoryId, x.IsVisible, x.Order });
+
+        b.HasIndex(x => new { x.IsVisible, x.Order });
+
+        b.HasQueryFilter(x => !x.IsDeleted);
+
+
+        b.HasOne(Ct => Ct.ParentCategory)
             .WithMany(Ct=>Ct.SubCategories)
             .HasForeignKey(Ct=>Ct.ParentCategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(Ct=>Ct.Products)
+        b.HasMany(Ct=>Ct.Products)
             .WithOne(P=>P.Category)
             .HasForeignKey(P=>P.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);

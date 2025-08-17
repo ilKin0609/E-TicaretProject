@@ -2,6 +2,16 @@
 
 public record CategoryCreateDto(
 
-    string Name,
-    Guid? ParentCategoryId
+    string NameAz,
+    string NameRu,
+    string NameEn,
+    Guid? ParentCategoryId,
+ 
+    string? MetaTitleAz,
+    string? MetaTitleRu,
+    string? MetaTitleEn,
+    string? MetaDescriptionAz,
+    string? MetaDescriptionRu,
+    string? MetaDescriptionEn,
+    string? Keywords
 );

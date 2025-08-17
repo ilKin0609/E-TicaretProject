@@ -1,4 +1,5 @@
-﻿using E_Ticaret_Project.Application.Shared.Responses;
+﻿using E_Ticaret_Project.Application.Abstracts.Services;
+using E_Ticaret_Project.Application.Shared.Responses;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
 using System.Text.Json;
@@ -9,11 +10,15 @@ public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlerMiddleware> _logger;
+    private readonly ILocalizationService _localizer;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
+    public ExceptionHandlingMiddleware(RequestDelegate next,
+        ILogger<ExceptionHandlerMiddleware> logger,
+        ILocalizationService localizer)
     {
         _next = next;
         _logger = logger;
+        _localizer = localizer;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -31,7 +36,7 @@ public class ExceptionHandlingMiddleware
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
             var response = new BaseResponse<string>(
-                message: "An unexpected error occured. Please try again later.",
+                message: _localizer.Get("Unexpected_Error"),
                 isSuccess: false,
                 statusCode: HttpStatusCode.InternalServerError
             );

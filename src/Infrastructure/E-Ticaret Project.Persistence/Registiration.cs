@@ -3,6 +3,7 @@ using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Infrastructure.Services;
 using E_Ticaret_Project.Persistence.Repositories;
 using E_Ticaret_Project.Persistence.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace E_Ticaret_Project.Persistence;
@@ -13,11 +14,15 @@ public static class Registiration
     {
         #region Repositories
         services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<IFavoriteRepository, FavoriteRepository>();
         services.AddScoped<IImageRepository, ImageRepository>();
-        services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IReviewAndCommentRepository, ReviewAndCommentRepository>();
+        services.AddScoped<ISpecialRequestRepository, SpecialRequestRepository>();
+        services.AddScoped<IAboutRepository, AboutRepository>();
+        services.AddScoped<IContactInfoRepository, ContactInfoRepository>();
+        services.AddScoped<IKeywordSearchStatRepository, KeywordSearchStatRepository>();
+        services.AddScoped<ITagRepository, TagRepository>();
+        services.AddScoped<IProductImageRepository, ProductImageRepository>();
+        services.AddScoped<ISiteSettingRepository, SiteSettingRepository>();
         #endregion
 
 
@@ -27,13 +32,21 @@ public static class Registiration
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<ICloudinaryService,CloudinaryService>();
+        services.AddScoped<IBackgroundJobService, HangfireJobService>();
+        services.AddSingleton<ILocalizationService, LocalizationService>();
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
         services.AddScoped<IUserAuthenticationService, UserAuthenticationService>();
-        services.AddScoped<IFavoriteService, FavoriteService>();
-        services.AddScoped<IReviewAndCommentService, ReviewAndCommentService>();
+        services.AddScoped<IAdminService, AdminService>();
         services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ICategoryService, CategoryService>();
-        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IAboutService, AboutService>();
+        services.AddScoped<IContactInfoService, ContactInfoService>();
+        services.AddScoped<ISpecialRequestService, SpecialRequestService>();
+        services.AddScoped<ISiteSettingService, SiteSettingService>();
+
+
 
         #endregion
     }

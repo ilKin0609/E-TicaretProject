@@ -1,11 +1,12 @@
-﻿using E_Ticaret_Project.Application.Abstracts.Services;
+﻿using E_Ticaret_Project.Application.Abstracts.Repositories;
+using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.DTOs.UserAuthenticationDtos;
 using E_Ticaret_Project.Application.Shared;
 using E_Ticaret_Project.Application.Shared.Responses;
 using E_Ticaret_Project.Application.Shared.Settings;
 using E_Ticaret_Project.Domain.Entities;
-using E_Ticaret_Project.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,106 +26,97 @@ public class UserAuthenticationService : IUserAuthenticationService
     private RoleManager<IdentityRole> _roleManager { get; }
     private JWTSettings _jwtSetting { get; }
 
+    private readonly string _receiverEmail;
+
+    private ILocalizationService _localizer { get; }
+    private ISiteSettingRepository _siteRepo { get; }
+
     public UserAuthenticationService(UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
     IOptions<JWTSettings> jwtSetting,
     RoleManager<IdentityRole> roleManager,
-    IEmailService mailService)
+    IEmailService mailService,
+    IOptions<EmailSettings> emailOptions,
+    ILocalizationService localizer,
+    ISiteSettingRepository siteRepo)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtSetting = jwtSetting.Value;
         _roleManager = roleManager;
         _mailService = mailService;
+        _receiverEmail = emailOptions.Value.ReceiverEmail;
+        _localizer = localizer;
+        _siteRepo = siteRepo;
     }
     public async Task<BaseResponse<string>> Register(UserRegisterDto dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
         if (user is not null)
-            return new("This user is already exist", HttpStatusCode.BadRequest);
+            return new(_localizer.Get("User_AlreadyExists"), HttpStatusCode.BadRequest);
 
-        AppUser newUser = new()
-        {
 
-            FullName = dto.FullName,
-            Email = dto.Email,
-            UserName = dto.Email
-        };
+        var subject = "Partnyor qeydiyyat sorğusu";
+        var nl = Environment.NewLine;
+        var body =
+            $"Yeni partnyor sorğusu:{nl}" +
+            $"Ad: {dto.Name}{nl}" +
+            $"Soyad: {dto.Surname}{nl}" +
+            $"Şirkət: {dto.Company}{nl}" +
+            $"Vəzifə: {dto.Duty}{nl}" +
+            $"Mobil: {dto.Phone}{nl}" +
+            $"E-mail: {dto.Email}{nl}{nl}" +
+            $"Sorğu göndərilmə vaxtı: {DateTime.Now}{nl}{nl}" +
+            $"Zəhmət olmasa yoxlayın və qərar verin.";
 
-        IdentityResult identityResult = await _userManager.CreateAsync(newUser, dto.Password);
-        if (!identityResult.Succeeded)
-        {
-            var errors = identityResult.Errors;
-            StringBuilder errorsMessage = new();
-            foreach (var error in errors)
-            {
-                errorsMessage.Append(error.Description + ";");
-            }
-            return new(errorsMessage.ToString(), HttpStatusCode.BadRequest);
-        }
 
-        var roleName = dto.Role.ToString();
-        if (roleName is null)
-            return new("Wrong format", HttpStatusCode.BadRequest);
+        body = body.Replace("\n", "<br/>");
 
-        await _userManager.AddToRoleAsync(newUser, roleName);
+        var notify = await GetNotifyEmailAsync(); 
+        await _mailService.SendEmailAsync(new List<string> { notify }, subject, body);
 
-        var confirmEmailLink = await GetEmailConfirmLink(newUser);
 
-        await _mailService.SendEmailAsync(new List<string> { newUser.Email }, "Email Confirmation", confirmEmailLink);
-
-        return new("Succesfully created", true, HttpStatusCode.Created);
+        return new(_localizer.Get("Partner_Register_Sent"), true, HttpStatusCode.OK);
     }
     public async Task<BaseResponse<TokenResponse>> Login(UserLoginDto dto)
     {
-        var existedUser = await _userManager.FindByEmailAsync(dto.Email);
+        var existedUser = await _userManager.FindByNameAsync(dto.UserName);
         if (existedUser is null)
         {
-            return new("Email or password is wrong", HttpStatusCode.NotFound);
+            return new(_localizer.Get("Auth_InvalidCredentials"), HttpStatusCode.NotFound);
         }
+        if (existedUser.isToggle)
+            return new(_localizer.Get("Login_Closed"), HttpStatusCode.BadRequest);
+
         if (!existedUser.EmailConfirmed)
         {
-            return new("Please confirm your email", HttpStatusCode.BadRequest);
+            return new(_localizer.Get("Auth_EmailNotConfirmed"), HttpStatusCode.BadRequest);
         }
-        SignInResult signInResult = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, true, true);
+        SignInResult signInResult = await _signInManager.PasswordSignInAsync(dto.UserName, dto.Password, true, true);
         if (!signInResult.Succeeded)
         {
-            return new("Email or password is wrong", null, HttpStatusCode.NotFound);
+            return new(_localizer.Get("Auth_InvalidCredentials"), null, HttpStatusCode.NotFound);
         }
-
+        existedUser.LastLoginAt = DateTime.Now;
         var token = await GenerateTokenAsync(existedUser);
-        return new("Token generated", token, HttpStatusCode.OK);
+        return new(_localizer.Get("Auth_TokenGenerated"), token, HttpStatusCode.OK);
     }
-    public async Task<BaseResponse<UserAbout>> Me(string token)
+    public async Task<BaseResponse<string>> LogoutAsync(ClaimsPrincipal principal)
     {
-        var handler = new JwtSecurityTokenHandler();
+        var user = await _userManager.GetUserAsync(principal);
+        if (user is null)
+            return new(_localizer.Get("Auth_User_NotFound"), HttpStatusCode.NotFound);
 
-        if (!handler.CanReadToken(token))
-            return new("Invalid token", HttpStatusCode.BadRequest);
+        // refresh tokeni etibarsız et
+        user.RefreshToken = null;
+        user.RefreshExpireDate = null;
 
-        var jwtToken = handler.ReadJwtToken(token);
+        await _userManager.UpdateAsync(user);
 
-        var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value;
-        if (userId is null)
-            return new("User not found", HttpStatusCode.NotFound);
+        // əgər cookie ilə də login ola bilərsə, çıxışı et
+        await _signInManager.SignOutAsync();
 
-        var user = await _userManager.FindByIdAsync(userId);
-        if(user is null)
-            return new("User not found", HttpStatusCode.NotFound);
-
-        var roles = await _userManager.GetRolesAsync(user);
-        var roleName = roles.FirstOrDefault();
-
-        var response = new UserAbout(
-        Token: token,
-        Id: user.Id,
-        FullName: user.FullName,
-        Email: user.Email,
-        ProfileImageUrl: user.ProfileImageUrl,
-        Role: Enum.Parse<RoleAdminEnum>(roleName)
-    );
-       return new("Success",response,HttpStatusCode.OK); 
-
+        return new(_localizer.Get("Auth_LoggedOut"), true, HttpStatusCode.OK);
     }
     public async Task<BaseResponse<TokenResponse>> RefreshTokenAsync(RefreshTokenRequest request)
     {
@@ -145,46 +137,55 @@ public class UserAuthenticationService : IUserAuthenticationService
         var tokenResponse = await GenerateTokenAsync(user);
         return new("Refreshed", tokenResponse, HttpStatusCode.OK);
     }
-    public async Task<BaseResponse<string>> ConfirmEmail(string userId, string token)
-    {
-        var existedUser = await _userManager.FindByIdAsync(userId);
-        if (existedUser is null)
-        {
-            return new("Email confirmation failed", HttpStatusCode.BadRequest);
-        }
-        var decodeToken=HttpUtility.UrlDecode(token);
-        var result = await _userManager.ConfirmEmailAsync(existedUser, decodeToken);
 
-        if (!result.Succeeded)
-        {
-            return new("Email confirmation failed", HttpStatusCode.BadRequest);
-        }
-        return new("Email confirmed successfully", true, HttpStatusCode.OK);
-    }
     public async Task<BaseResponse<string>> ForgotPassword(UserForgotPasswordDto dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
-
         if (user is null)
-            return new("User not existed", HttpStatusCode.NotFound);
+            return new(_localizer.Get("Auth_User_NotExisted"), HttpStatusCode.NotFound);
 
         if (!user.EmailConfirmed)
-            return new("Email is not confirmed", HttpStatusCode.BadRequest);
+            return new(_localizer.Get("Auth_EmailNotConfirmed"), HttpStatusCode.BadRequest);
+
+        var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+        var sentAtBaku = DateTimeOffset.UtcNow
+    .ToOffset(TimeSpan.FromHours(4))
+    .ToString("yyyy-MM-dd HH:mm:ss");
+
+        if (!isAdmin)
+        {
+            var bodyForAdmin =
+                $"Partnyordan parol dəyişdirmə sorğusu\n" +
+                $"- Ad: {user.Name} {user.Surname}\n" +
+                $"- Email: {user.Email}\n" +
+                $"- Şirkət: {user.Company}\n" +
+                $"- Vəzifə: {user.Duty}\n" +
+                $"- Sorğu göndərilmə vaxtı : {sentAtBaku}";
+
+            bodyForAdmin = bodyForAdmin.Replace("\n", "<br/>");
+
+            var notify = await GetNotifyEmailAsync();   // <-- YENİ
+            await _mailService.SendEmailAsync(new List<string> { notify },
+                "Partnyor parolunun dəyişdirilməsi sorğusu", bodyForAdmin);
+
+            return new(_localizer.Get("Partner_Reset_SentToAdmin"), true, HttpStatusCode.OK);
+        }
+
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var link = $"{_jwtSetting.Issuer}/api/Authentications/ResetPassword?userId={user.Id}&token={HttpUtility.UrlEncode(token)}";
 
-        var link = $"https://localhost:7150/api/Authentications/ResetPassword?userId={user.Id}&token={HttpUtility.UrlEncode(token)}";
+        await _mailService.SendEmailAsync(new List<string> { user.Email! }, "Reset password", link);
 
-        await _mailService.SendEmailAsync(new List<string> { user.Email }, "Reset password", link);
-
-        return new("Link successfully sended.Please check your gmail", token, HttpStatusCode.OK);
+        return new("Sıfırlama linki göndərildi. Zəhmət olmasa e-poçtunuzu yoxlayın.", token, HttpStatusCode.OK);
     }
     public async Task<BaseResponse<string>> ResetPassword(UserResetPasswordDto dto)
     {
         var user = await _userManager.FindByIdAsync(dto.UserId);
 
         if (user is null)
-            return new("User not existed", HttpStatusCode.NotFound);
+            return new("Istifadeci tapilmadi", HttpStatusCode.NotFound);
         var decodedToken = HttpUtility.UrlDecode(dto.Token);
         var result = await _userManager.ResetPasswordAsync(user, decodedToken, dto.NewPassword);
 
@@ -194,15 +195,28 @@ public class UserAuthenticationService : IUserAuthenticationService
             return new(errors, HttpStatusCode.BadRequest);
         }
 
+        var body =
+               $"Şifrə uğurla yeniləndi\n";
+
+        body = body.Replace("\n", "<br/>");
+
+        await _mailService.SendEmailAsync(new List<string> { user.Email! }, "Admin şifrə dəyişdirilməsi sorğusu", body);
+
         return new("Password succesfully changed.", true, HttpStatusCode.OK);
     }
-    private async Task<string> GetEmailConfirmLink(AppUser user)
-    {
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var link = $"https://localhost:7150/api/Authentications/ConfirmEmail?userId={user.Id}&token={HttpUtility.UrlEncode(token)}";
 
-        return link;
-    }
+
+
+
+
+
+
+
+
+
+
+
+
     private string GenerateRefreshToken()
     {
         var randomNumber = new byte[32];
@@ -304,4 +318,15 @@ public class UserAuthenticationService : IUserAuthenticationService
         }
         return null;
     }
+    private async Task<string> GetNotifyEmailAsync()
+    {
+        // DB-dən aktiv site setting-i oxu
+        var dbEmail = await _siteRepo.GetAll()
+            .Select(s => s.PublicEmail)
+            .FirstOrDefaultAsync();
+
+        // boşdursa appsettings-dəki ReceiverEmail-ə fallback
+        return !string.IsNullOrWhiteSpace(dbEmail) ? dbEmail : _receiverEmail;
+    }
+
 }

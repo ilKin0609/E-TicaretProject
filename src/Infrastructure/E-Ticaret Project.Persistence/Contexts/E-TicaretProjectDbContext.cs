@@ -13,12 +13,16 @@ public class E_TicaretProjectDbContext:IdentityDbContext<AppUser>
     }
 
     public DbSet<Category> Categories { get; set; }
-    public DbSet<Favorite> Favorites { get; set; }
+    public DbSet<AboutUs> AboutUs { get; set; }
     public DbSet<Image> Images { get; set; }
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<ContactInfo> ContactInfo { get; set; }
     public DbSet<Product> Products { get; set; }
-    public DbSet<ReviewAndComment> ReviewAndComments { get; set; }
+    public DbSet<ProductImage> ProductImages { get; set; }
+    public DbSet<ProductTag> ProductTags { get; set; }
+    public DbSet<Tag> Tags { get; set; }
+    public DbSet<SpecialRequest> SpecialRequests { get; set; }
+    public DbSet<SiteSetting> SiteSetting { get; set; }
+    public DbSet<KeywordSearchStat> KeywordSearchStats { get; set; }
 
 
 

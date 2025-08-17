@@ -1,28 +1,58 @@
-using CloudinaryDotNet;
+Ôªøusing E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.Shared.Permissions;
 using E_Ticaret_Project.Application.Shared.Settings;
 using E_Ticaret_Project.Application.Validations.CategoryValidations;
 using E_Ticaret_Project.Domain.Entities;
 using E_Ticaret_Project.Persistence;
 using E_Ticaret_Project.Persistence.Contexts;
+using E_Ticaret_Project.Persistence.Services;
 using E_Ticaret_Project.WebApi.Middlewares;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Globalization;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddControllers();
+
+var supportedCultures = new[] { "az", "en", "ru" }
+    .Select(c => new CultureInfo(c))
+    .ToList();
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture("az");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+
+    options.RequestCultureProviders = new List<IRequestCultureProvider>
+    {
+        new AcceptLanguageHeaderRequestCultureProvider()
+    };
+});
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
+
+
 // Add services to the container.
 builder.Services.AddValidatorsFromAssembly(typeof(CategoryCreateDtoValidator).Assembly);
-builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddFluentValidationClientsideAdapters();;
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -30,11 +60,11 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "AzBina API",
+        Title = "LABstend API",
         Version = "v1"
     });
 
-    // JWT ¸Á¸n t?hl¸k?sizlik sxemini ?lav? et
+    // JWT √º√ß√ºn t?hl√ºk?sizlik sxemini ?lav? et
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -45,7 +75,7 @@ builder.Services.AddSwaggerGen(options =>
         Description = "JWT token daxil edin. Format: Bearer {token}"
     });
 
-    // T?hl¸k?sizlik t?l?bi ?lav? olunur
+    // T?hl√ºk?sizlik t?l?bi ?lav? olunur
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -61,6 +91,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+builder.Services.AddHealthChecks();
 
 
 builder.Services.AddDbContext<E_TicaretProjectDbContext>(options =>
@@ -83,15 +114,27 @@ builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JWTSettings>();
 
-builder.Services.Configure<CloudinarySettings>(
-    builder.Configuration.GetSection("CloudinarySettings"));
 
-builder.Services.AddSingleton<Cloudinary>(provider =>
+builder.Services.AddCors(options =>
 {
-    var config = provider.GetRequiredService<IOptions<CloudinarySettings>>().Value;
-    var account = new Account(config.CloudName, config.ApiKey, config.ApiSecret);
-    return new Cloudinary(account);
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
+
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
+//var hangfireEnabled = builder.Configuration.GetValue<bool>("Hangfire:Enabled", false);
+//if (hangfireEnabled)
+//{
+//    builder.Services.AddHangfire(cfg =>
+//        cfg.UseSqlServerStorage(builder.Configuration.GetConnectionString("Default")));
+//    builder.Services.AddHangfireServer();
+//}
+
 builder.Services.AddAuthorization(options =>
 {
 
@@ -124,23 +167,44 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.RegisterService();
+
+builder.Services.AddDataProtection();
+builder.Services.AddSingleton<IPasswordVault, PasswordVault>();
+
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(locOptions.Value);
+
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+
+var enableSwagger = app.Configuration.GetValue<bool>("EnableSwagger", true);
+if (enableSwagger)
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(); // /swagger v…ô /swagger/index.html
 }
+
 // Configure the HTTP request pipeline.
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+
+app.MapHealthChecks("/health");
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowAll");
+//if (hangfireEnabled)
+//{
+//    app.UseHangfireDashboard("/hangfire");
+//}
 
 app.MapControllers();
-//app.UseStaticFiles();
-
 app.Run();

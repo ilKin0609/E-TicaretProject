@@ -74,7 +74,6 @@ public class RoleService:IRoleService
         if (existingRole is not null)
             return new("Bu adda rol artıq mövcuddur", HttpStatusCode.BadRequest);
 
-        // Yeni rol yarat
         var identityRole = new IdentityRole(dto.Name);
         var result = await _roleManager.CreateAsync(identityRole);
 
@@ -83,16 +82,25 @@ public class RoleService:IRoleService
             var errorMessages = string.Join(";", result.Errors.Select(e => e.Description));
             return new(errorMessages, HttpStatusCode.BadRequest);
         }
+        
 
-        foreach (var permission in dto.PermissionList.Distinct())
+        var permissions = (dto!.PermissionList ?? Enumerable.Empty<string>())
+        .Select(p => (p ?? "").Trim())
+        .Where(p => !string.IsNullOrWhiteSpace(p))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
+
+        
+        foreach (var permission in permissions)
         {
             var claimResult = await _roleManager.AddClaimAsync(identityRole, new Claim("Permission", permission));
             if (!claimResult.Succeeded)
             {
                 var error = string.Join(";", claimResult.Errors.Select(e => e.Description));
-                return new($"Role created,but adding permission '{permission}' failed:{error}", HttpStatusCode.PartialContent);
+                return new($"Role created, but adding permission '{permission}' failed: {error}", HttpStatusCode.PartialContent);
             }
         }
+
         return new("Role created succesfully", true, HttpStatusCode.Created);
     }
 

@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/*.user
+**/*.suo
+.git
+.gitignore
+.env
+docker-compose*
+README.md
+
+**/appsettings.json
+**/appsettings.*.json

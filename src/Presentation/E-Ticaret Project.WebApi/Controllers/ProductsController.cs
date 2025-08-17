@@ -1,10 +1,7 @@
-﻿using CloudinaryDotNet.Actions;
-using CloudinaryDotNet;
-using E_Ticaret_Project.Application.Abstracts.Services;
-using E_Ticaret_Project.Application.DTOs.FavoriteDtos;
+﻿using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.DTOs.ProductDtos;
+using E_Ticaret_Project.Application.Shared.Permissions;
 using E_Ticaret_Project.Application.Shared.Responses;
-using E_Ticaret_Project.Persistence.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -18,155 +15,236 @@ namespace E_Ticaret_Project.WebApi.Controllers
     public class ProductsController : ControllerBase
     {
         private IProductService _productService { get; }
-        private Cloudinary _cloudDinary { get; }
-        public ProductsController(IProductService productService, Cloudinary cloudinary)
+
+        public ProductsController(IProductService productService)
         {
             _productService = productService;
-            _cloudDinary = cloudinary;
-        }
-        // GET: api/<ProductsController>
-        [HttpGet]
-        [ProducesResponseType(typeof(BaseResponse<List<ProductGetDto>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAllProduct()
-        {
-            var result= await _productService.GetAllProduct();
-            return StatusCode((int)result.StatusCode, result);
+
         }
 
-        // GET api/<ProductsController>/5
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(BaseResponse<ProductGetDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetByIdProduct(Guid id)
-        {
-            var result = await _productService.GetByIdProduct(id);
-            return StatusCode((int)result.StatusCode, result);
-        }
 
         [HttpGet]
-        [ProducesResponseType(typeof(BaseResponse<List<ProductGetDto>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetByTitleProduct([FromQuery] string title)
-        {
-            var result = await _productService.GetByTitleProduct(title);
-            return StatusCode((int)result.StatusCode, result);
-        }
-
-        [HttpGet]
-        [Authorize(Policy = "Product.GetMy")]
-        [ProducesResponseType(typeof(BaseResponse<List<ProductGetDto>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetMyProducts([FromQuery] string userId)
-        {
-            var result = await _productService.GetMyProducts(userId);
-            return StatusCode((int)result.StatusCode, result);
-        }
-
-        [HttpGet]
-        [ProducesResponseType(typeof(BaseResponse<List<ProductGetDto>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDiscountProducts()
-        {
-            var result = await _productService.GetDiscountProducts();
-            return StatusCode((int)result.StatusCode, result);
-        }
-
-        [HttpGet]
-        [ProducesResponseType(typeof(BaseResponse<List<ProductGetDto>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetByCategoryProducts([FromQuery] Guid categoryId)
-        {
-            var result = await _productService.GetByCategoryProducts(categoryId);
-            return StatusCode((int)result.StatusCode, result);
-        }
-
-
-        // POST api/<ProductsController>
-        [HttpPost]
-        [Authorize(Policy = "Product.Create")]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(BaseResponse<ProductDetailDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CreateProduct([FromForm] ProductCreateDto dto)
+        public async Task<IActionResult> GetDetailById([FromQuery] Guid id)
         {
-            var result = await _productService.CreateProduct(dto);
+            var result = await _productService.GetDetailByIdAsync(id);
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpPost]
-        [Authorize(Policy = "Product.AddProductFavorite")]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
+        // GET: /api/Products/GetDetailBySid?sid=XXXX
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<ProductDetailDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> AddProductFavorite([FromBody] FavoriteCreateDto dto)
+        public async Task<IActionResult> GetDetailBySid([FromQuery] string sid)
         {
-            var result = await _productService.AddProductFavorite(dto);
+            var result = await _productService.GetDetailBySidAsync(sid);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetByCategory([FromQuery] Guid categoryId)
+        {
+            var result = await _productService.GetByCategoryAsync(categoryId);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<ProductCardDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetByProductCode([FromQuery] string ProductCode)
+        {
+            var result = await _productService.GetBySKUAsync(ProductCode);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetBySearch([FromQuery] string search)
+        {
+            var result = await _productService.SearchAsync(search);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<List<ProductImageDto>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetImages([FromQuery] Guid productId)
+        {
+            var r = await _productService.GetImagesAsync(productId);
+            return StatusCode((int)r.StatusCode, r);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<ProductImageDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetMainImage([FromQuery] Guid productId)
+        {
+            var r = await _productService.GetMainImageAsync(productId);
+            return StatusCode((int)r.StatusCode, r);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetByTagId([FromQuery] Guid tagId)
+        {
+            var result = await _productService.GetByTagId(tagId);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> SearchByTag([FromQuery] string Tag)
+        {
+            var result = await _productService.GetByTagAsync(Tag);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> SearchByManyTag([FromQuery] List<string> Tags)
+        {
+            var result = await _productService.GetByTagsAsync(Tags);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetAll([FromQuery] int size = 40)
+        {
+            var result = await _productService.GetAllAsync(size);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+
+        [HttpPost]
+        [Authorize(Policy = Permission.Product.Create)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Conflict)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDto dto)
+        {
+            var result = await _productService.CreateAsync(dto);
             return StatusCode((int)result.StatusCode, result);
         }
 
         [HttpPost]
-        [Authorize(Policy = "Product.AddProductImage")]
+        [Authorize(Policy = Permission.Product.UploadMainImage)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> AddProductImage([FromForm] Guid productId, List<IFormFile> images)
+        public async Task<IActionResult> UploadMainImage([FromForm] ProductMainImageUploadDto dto)
         {
-            var result = await _productService.AddProductImage(productId,images);
-            return StatusCode((int)result.StatusCode, result);
+            var r = await _productService.UploadMainImageAsync(dto);
+            return StatusCode((int)r.StatusCode, r);
         }
 
-        // PUT api/<ProductsController>/5
+        // --- UPLOAD ADDITIONAL ---
+        [HttpPost]
+        [Authorize(Policy = Permission.Product.UploadAdditionalImage)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> UploadAdditionalImage([FromForm] ProductAdditionalImageUploadDto dto)
+        {
+            var r = await _productService.UploadAdditionalImageAsync(dto);
+            return StatusCode((int)r.StatusCode, r);
+        }
+
+
         [HttpPut]
-        [Authorize(Policy = "Product.Update")]
-        [ProducesResponseType(typeof(BaseResponse<ProductUpdateDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> UpdateProduct([FromForm] ProductUpdateDto dto)
-        {
-            var result = await _productService.UpdateProduct(dto);
-            return StatusCode((int)result.StatusCode, result);
-        }
-
-        // DELETE api/<ProductsController>/5
-        [HttpDelete("{id}")]
-        [Authorize(Policy = "Product.Delete")]
+        [Authorize(Policy = Permission.Product.SetMain)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> SetMainImage([FromBody] SetMainDto dto)
+        {
+            var r = await _productService.SetMainImageAsync(dto);
+            return StatusCode((int)r.StatusCode, r);
+        }
+
+        [HttpPut]
+        [Authorize(Policy = Permission.Product.ReorderImage)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> DeleteProduct(Guid id)
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ReorderImages([FromBody]ListedReorderDto dto)
         {
-            var result = await _productService.DeleteProduct(id);
-            return StatusCode((int)result.StatusCode, result);
+            var r = await _productService.ReorderImagesAsync(dto);
+            return StatusCode((int)r.StatusCode, r);
         }
 
-        [HttpDelete("{Id}")]
-        [Authorize(Policy = "Product.DeleteProductFavorite")]
+        [HttpPut]
+        [Authorize(Policy = Permission.Product.UpdateImageAlt)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RemoveProductFavorite(Guid Id)
+        public async Task<IActionResult> UpdateImageAlt([FromBody]  ProductUpdateAltDto dto)
         {
-            var result = await _productService.RemoveProductFavorite(Id);
+            var r = await _productService.UpdateImageAltAsync(dto);
+            return StatusCode((int)r.StatusCode, r);
+        }
+
+        [HttpPut]
+        [Authorize(Policy = Permission.Product.Update)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> Update([FromBody] ProductUpdateDto dto)
+        {
+            var result = await _productService.UpdateAsync(dto);
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpDelete("{imageId}")]
-        [Authorize(Policy = "Product.DeleteProductImage")]
+
+        [HttpDelete]
+        [Authorize(Policy = Permission.Product.RemoveImage)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> RemoveImage([FromQuery] Guid imageId)
+        {
+            var r = await _productService.RemoveImageAsync(imageId);
+            return StatusCode((int)r.StatusCode, r);
+        }
+
+        [HttpDelete]
+        [Authorize(Policy = Permission.Product.Delete)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RemoveProductImage(Guid imageId)
+        public async Task<IActionResult> HardDelete([FromQuery] Guid id)
         {
-            var result = await _productService.RemoveProductImage(imageId);
+            var result = await _productService.DeleteAsync(id);
             return StatusCode((int)result.StatusCode, result);
         }
 

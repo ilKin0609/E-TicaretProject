@@ -1,4 +1,6 @@
-﻿namespace E_Ticaret_Project.Application.Shared.Permissions;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+
+namespace E_Ticaret_Project.Application.Shared.Permissions;
 
 public static class Permission
 {
@@ -7,33 +9,20 @@ public static class Permission
         public const string Create = "Category.Create";
         public const string Update = "Category.Update";
         public const string Delete = "Category.Delete";
+        public const string Toggle = "Category.Toggle";
+        public const string Reorder = "Category.Reorder";
+        public const string ReorderList = "Category.ReorderList";
+        public const string ChangeParent = "Category.ChangeParent";
 
         public static List<string> All = new()
         {
             Create,
             Update,
-            Delete
-        };
-    }
-    public static class Order
-    {
-        public const string Create = "Order.Create";
-        public const string Delete = "Order.Delete";
-        public const string Update = "Order.Update";
-        public const string GetMy = "Order.GetMy";
-        public const string GetAll = "Order.GetAll";
-        public const string GetDetail = "Order.GetDetail";
-        public const string GetMySales = "Order.MySales";
-
-        public static List<string> All = new()
-        {
-            Create,
             Delete,
-            Update,
-            GetMy,
-            GetAll,
-            GetMySales,
-            GetDetail
+            Toggle,
+            Reorder,
+            ReorderList,
+            ChangeParent,
         };
     }
     public static class Product
@@ -41,47 +30,53 @@ public static class Permission
         public const string Create = "Product.Create";
         public const string Update = "Product.Update";
         public const string Delete = "Product.Delete";
-        public const string GetMy = "Product.GetMy";
-        public const string DeleteProductImage = "Product.DeleteProductImage";
-        public const string AddProductImage = "Product.AddProductImage";
-        public const string AddProductFavorite = "Product.AddProductFavorite";
-        public const string DeleteProductFavorite = "Product.DeleteProductFavorite";
+        public const string UploadMainImage = "Product.UploadMainImage";
+        public const string UploadAdditionalImage = "Product.UploadAdditionalImage";
+        public const string RemoveImage = "Product.RemoveImage";
+        public const string SetMain = "Product.SetMain";
+        public const string ReorderImage = "Product.ReorderImage";
+        public const string UpdateImageAlt = "Product.UpdateImageAlt";
 
         public static List<string> All = new()
         {
             Create,
             Update,
             Delete,
-            GetMy,
-            DeleteProductImage,
-            AddProductImage,
-            AddProductFavorite,
-            DeleteProductFavorite
+            UploadMainImage,
+            UploadAdditionalImage,
+            RemoveImage,
+            SetMain,
+            ReorderImage,
+            UpdateImageAlt
         };
     }
-    public static class ReviewAndComment
+
+    public static class ContactInfo
     {
-        public const string Create = "ReviewAndComment.Create";
-        public const string Delete = "ReviewAndComment.Delete";
-        public const string GetByProductId = "ReviewAndComment.GetByProductId";
+        public const string Update = "Contact.Update";
 
         public static List<string> All = new()
         {
-            Create,
-            Delete,
-            GetByProductId
+            Update
         };
     }
-    public static class Favorite
+
+    public static class About
     {
-        
-        public const string GetFavProducts = "Favorite.GetFavProducts";
+        public const string Update = "About.Update";
+        public const string UploadImage = "About.UploadImage";
+        public const string RemoveImage = "About.RemoveImage";
 
         public static List<string> All = new()
         {
-           GetFavProducts
+            
+            Update,
+            UploadImage,
+            RemoveImage
+            
         };
     }
+
     public static class Role
     {
         public const string GetAllPermissions = "Role.GetAllPermissions";
@@ -97,12 +92,15 @@ public static class Permission
             Delete
         };
     }
-    public static class Account
+    public static class Admin
     {
-        public const string AddRole = "Account.AddRole";
-        public const string Create = "Account.Create";
-        public const string GetAllUser = "Account.GetAllUser";
-        public const string GetUser = "Account.GetUser";
+        public const string AddRole = "Admin.AddRole";
+        public const string Create = "Admin.CreateUser";
+        public const string GetAllUser = "Admin.GetAllUser";
+        public const string Delete = "Admin.DeleteUser";
+        public const string Update = "Admin.UpdateUser";
+        public const string Toggle = "Admin.ToggleUser";
+        public const string UnToggle = "Admin.UnToggleUser";
 
 
         public static List<string> All = new()
@@ -110,19 +108,23 @@ public static class Permission
            AddRole,
            Create,
            GetAllUser,
-           GetUser
+           Delete,
+           Update,
+           Toggle,
+           UnToggle
         };
     }
-    public static class User
+
+    public static class SiteSetting
     {
-        public const string ResetPassword = "User.ResetPassword";
-        public const string GetMy = "User.GetMy";
+        public const string GetAll = "SiteSetting.GetAll";
+        public const string Update = "SiteSetting.Update";
 
 
         public static List<string> All = new()
         {
-           ResetPassword,
-           GetMy
+           GetAll,
+           Update
         };
     }
 }

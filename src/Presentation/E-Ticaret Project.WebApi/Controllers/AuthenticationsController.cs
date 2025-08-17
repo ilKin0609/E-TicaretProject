@@ -22,7 +22,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         // POST api/<AuthenticationsController>
         [HttpPost]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
 
@@ -35,12 +35,21 @@ namespace E_Ticaret_Project.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponse<TokenResponse>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
 
         public async Task<IActionResult> Login([FromBody] UserLoginDto dto)
         {
             var result = await _userAuthenticationService.Login(dto);
             return StatusCode((int)result.StatusCode, result);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            var r = await _userAuthenticationService.LogoutAsync(User);
+            return StatusCode((int)r.StatusCode, r);
         }
 
 
@@ -58,7 +67,6 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -71,7 +79,6 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "User.ResetPassword")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -83,28 +90,8 @@ namespace E_Ticaret_Project.WebApi.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpGet]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        
 
-        public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
-        {
-            var result = await _userAuthenticationService.ConfirmEmail(userId, token);
-            return StatusCode((int)result.StatusCode, result);
-        }
-
-        [HttpGet]
-        [Authorize(Policy = "User.GetMy")]
-        [ProducesResponseType(typeof(BaseResponse<UserAbout>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-
-        public async Task<IActionResult> Me([FromQuery] string token)
-        {
-            var result = await _userAuthenticationService.Me(token);
-            return StatusCode((int)result.StatusCode, result);
-        }
+       
     }
 }

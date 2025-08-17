@@ -22,6 +22,115 @@ namespace E_Ticaret_Project.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AboutUs", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DescriptionAZ")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DescriptionEN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DescriptionRU")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Keywords")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("MetaDescription_Az")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("MetaDescription_En")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("MetaDescription_Ru")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("MetaTitle_Az")
+                        .IsRequired()
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
+                    b.Property<string>("MetaTitle_En")
+                        .IsRequired()
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
+                    b.Property<string>("MetaTitle_Ru")
+                        .IsRequired()
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
+                    b.Property<string>("TitleAZ")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TitleEN")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TitleRU")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AboutUs");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            CreatedAt = new DateTime(2025, 8, 16, 15, 54, 39, 467, DateTimeKind.Utc).AddTicks(5714),
+                            DescriptionAZ = "LABstend Şirkəti",
+                            DescriptionEN = "LABstend Company",
+                            DescriptionRU = "Компания Лабстенд ",
+                            IsDeleted = false,
+                            Keywords = "Vinil,Banner,Reklam,Forex",
+                            MetaDescription_Az = "Vinil, banner, forex və digər reklam xidmətləri təklif edən peşəkar şirkət.",
+                            MetaDescription_En = "Professional company offering vinyl, banner, forex and other advertising services.",
+                            MetaDescription_Ru = "Профессиональная компания, предлагающая винил, баннер, форекс и другие рекламные услуги.",
+                            MetaTitle_Az = "LABstend - Reklam Xidməti",
+                            MetaTitle_En = "LABstend - Advertising Service",
+                            MetaTitle_Ru = "LABstend - Рекламные Услуги",
+                            TitleAZ = "Haqqımızda",
+                            TitleEN = "AboutUs",
+                            TitleRU = "О нас"
+                        });
+                });
+
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -30,9 +139,19 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Company")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Duty")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -41,16 +160,19 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -60,7 +182,13 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<DateOnly?>("PartnerRequestAt")
+                        .HasColumnType("date");
+
                     b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordVault")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
@@ -69,11 +197,7 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("ProfileImageUrl")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<DateTime>("RefreshExpireDate")
+                    b.Property<DateTime?>("RefreshExpireDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("RefreshToken")
@@ -82,12 +206,20 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("isToggle")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -117,13 +249,62 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Keywords")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("MetaDescriptionAz")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("MetaDescriptionEn")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("MetaDescriptionRu")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("MetaTitleAz")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("MetaTitleEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("MetaTitleRu")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("NameAz")
                         .IsRequired()
-                        .HasMaxLength(350)
-                        .HasColumnType("nvarchar(350)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NameRu")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("ParentCategoryId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -133,16 +314,37 @@ namespace E_Ticaret_Project.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentCategoryId");
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("IsVisible", "Order");
+
+                    b.HasIndex("ParentCategoryId", "IsVisible", "Order");
 
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Favorite", b =>
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.ContactInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AddressAZ")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("AddressEN")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("AddressRU")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -150,11 +352,62 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<Guid?>("CreatedUser")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Keywords")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MapIframeSrc")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MetaDescription_Az")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MetaDescription_En")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MetaDescription_Ru")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MetaTitle_Az")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MetaTitle_En")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MetaTitle_Ru")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Title_Az")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title_En")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title_Ru")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -162,18 +415,33 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<Guid?>("UpdatedUser")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.ToTable("ContactInfo");
 
-                    b.HasIndex("UserId", "ProductId")
-                        .IsUnique();
-
-                    b.ToTable("Favorites");
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            AddressAZ = "Bakı, Azərbaycan",
+                            AddressEN = "Baku, Azerbaijan",
+                            AddressRU = "Баку, Азербайджан",
+                            CreatedAt = new DateTime(2025, 8, 16, 15, 54, 39, 468, DateTimeKind.Utc).AddTicks(5083),
+                            Email = "info@example.com",
+                            IsDeleted = false,
+                            Keywords = "Əlaqə, Bizimlə əlaqə, Contact, Communication",
+                            MapIframeSrc = "https://maps.google.com/?q=labstend",
+                            MetaDescription_Az = "Bizimlə əlaqə saxlayın",
+                            MetaDescription_En = "Contact us",
+                            MetaDescription_Ru = "Свяжитесь с нами",
+                            MetaTitle_Az = "Əlaqə",
+                            MetaTitle_En = "Contact",
+                            MetaTitle_Ru = "Контакт",
+                            Phone = "+994502223344",
+                            Title_Az = "Əlaqə məlumatları",
+                            Title_En = "Contact Information",
+                            Title_Ru = "Контактная информация"
+                        });
                 });
 
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Image", b =>
@@ -182,24 +450,32 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("AboutUsId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("CreatedUser")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Image_Url")
+                    b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PublicId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<Guid?>("SpecialRequestId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -207,28 +483,27 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<Guid?>("UpdatedUser")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("is_main")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("Image_Url")
+                    b.HasIndex("AboutUsId")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("ImageUrl")
                         .IsUnique();
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("SpecialRequestId");
 
                     b.ToTable("Images");
                 });
 
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Order", b =>
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.KeywordSearchStat", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("BuyerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<long>("Count")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -239,33 +514,18 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("OrderDate")
+                    b.Property<string>("Keyword")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<DateTime>("LastSearchedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("OrderStatus")
+                    b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ShippingAddress")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("ShoppingAddress")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("TrackingCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -275,33 +535,11 @@ namespace E_Ticaret_Project.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BuyerId");
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
-                    b.HasIndex("TrackingCode")
-                        .IsUnique();
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.OrderItem", b =>
-                {
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("FirstPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("OrderCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderId", "ProductId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("OrderItems");
+                    b.ToTable("KeywordSearchStats");
                 });
 
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Product", b =>
@@ -310,7 +548,7 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CategoryId")
+                    b.Property<Guid?>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -319,31 +557,71 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<Guid?>("CreatedUser")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                    b.Property<string>("DescAz")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Discount")
-                        .HasColumnType("int");
+                    b.Property<string>("DescEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DescRu")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("OwnerId")
+                    b.Property<string>("MetaDescriptionAz")
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("MetaDescriptionEn")
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("MetaDescriptionRu")
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("MetaTitleAz")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<string>("MetaTitleEn")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<string>("MetaTitleRu")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<decimal?>("PartnerPriceAZN")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PriceAZN")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("SID")
                         .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("SlugAz")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("Rating")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Stock")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Tittle")
+                    b.Property<string>("TitleAz")
                         .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TitleEn")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TitleRu")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -357,21 +635,36 @@ namespace E_Ticaret_Project.Persistence.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("SID")
+                        .IsUnique();
+
+                    b.HasIndex("SKU")
+                        .IsUnique();
+
+                    b.HasIndex("SlugAz")
+                        .IsUnique()
+                        .HasFilter("[SlugAz] IS NOT NULL");
 
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.ReviewAndComment", b =>
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.ProductImage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                    b.Property<string>("AltAz")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AltEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AltRu")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("AutoAltFromMeta")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -382,11 +675,21 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ParentId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -394,19 +697,122 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Property<Guid?>("UpdatedUser")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("ProductId", "IsMain")
+                        .IsUnique()
+                        .HasFilter("[IsMain] = 1");
 
-                    b.HasIndex("ProductId");
+                    b.ToTable("ProductImages");
+                });
 
-                    b.HasIndex("UserId");
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.ProductTag", b =>
+                {
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.ToTable("ReviewAndComments");
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ProductId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ProductTags");
+                });
+
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.SpecialRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("OrderAbout")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SpecialRequests");
+                });
+
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -542,6 +948,111 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SiteSetting", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BingSiteVerification")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("DisablePartnerLogin")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FacebookUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GoogleSiteVerification")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("HidePopCategory")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HideProductPrices")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HideSearchBar")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("HomeKeywords")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HomeMetaDescriptionAz")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HomeMetaDescriptionEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HomeMetaDescriptionRu")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HomeMetaTitleAz")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HomeMetaTitleEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HomeMetaTitleRu")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InstagramUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PublicEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScrollText")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int?>("ScrollTextSpeed")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("WhatsappInquiryLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("YandexSiteVerification")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("YoutubeUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SiteSetting");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            CreatedAt = new DateTime(2025, 8, 16, 15, 54, 39, 470, DateTimeKind.Utc).AddTicks(1857),
+                            DisablePartnerLogin = false,
+                            HidePopCategory = false,
+                            HideProductPrices = false,
+                            HideSearchBar = false,
+                            IsDeleted = false,
+                            ScrollText = "Xoş gəlmisiniz!",
+                            WhatsappInquiryLink = "https://wa.me/994000000000"
+                        });
+                });
+
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Category", b =>
                 {
                     b.HasOne("E_Ticaret_Project.Domain.Entities.Category", "ParentCategory")
@@ -552,64 +1063,21 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Navigation("ParentCategory");
                 });
 
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Favorite", b =>
-                {
-                    b.HasOne("E_Ticaret_Project.Domain.Entities.Product", "Product")
-                        .WithMany("Favorites")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("E_Ticaret_Project.Domain.Entities.AppUser", "User")
-                        .WithMany("Favorites")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Image", b =>
                 {
-                    b.HasOne("E_Ticaret_Project.Domain.Entities.Product", "Product")
-                        .WithMany("Images")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.HasOne("AboutUs", "AboutUs")
+                        .WithOne("Image")
+                        .HasForeignKey("E_Ticaret_Project.Domain.Entities.Image", "AboutUsId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Navigation("Product");
-                });
+                    b.HasOne("E_Ticaret_Project.Domain.Entities.SpecialRequest", "SpecialRequest")
+                        .WithOne("File")
+                        .HasForeignKey("E_Ticaret_Project.Domain.Entities.Image", "SpecialRequestId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Order", b =>
-                {
-                    b.HasOne("E_Ticaret_Project.Domain.Entities.AppUser", "Buyer")
-                        .WithMany("Buyers")
-                        .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Navigation("AboutUs");
 
-                    b.Navigation("Buyer");
-                });
-
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.OrderItem", b =>
-                {
-                    b.HasOne("E_Ticaret_Project.Domain.Entities.Order", "Order")
-                        .WithMany("Items")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("E_Ticaret_Project.Domain.Entities.Product", "Product")
-                        .WithMany("Items")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
+                    b.Navigation("SpecialRequest");
                 });
 
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Product", b =>
@@ -617,44 +1085,39 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.HasOne("E_Ticaret_Project.Domain.Entities.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("E_Ticaret_Project.Domain.Entities.AppUser", "Owner")
-                        .WithMany("Sellers")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Owner");
-                });
-
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.ReviewAndComment", b =>
-                {
-                    b.HasOne("E_Ticaret_Project.Domain.Entities.ReviewAndComment", "Parent")
-                        .WithMany("Replies")
-                        .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.ProductImage", b =>
+                {
                     b.HasOne("E_Ticaret_Project.Domain.Entities.Product", "Product")
-                        .WithMany("Comments")
+                        .WithMany("Images")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("E_Ticaret_Project.Domain.Entities.AppUser", "User")
-                        .WithMany("Comments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.ProductTag", b =>
+                {
+                    b.HasOne("E_Ticaret_Project.Domain.Entities.Product", "Product")
+                        .WithMany("ProductTags")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Parent");
+                    b.HasOne("E_Ticaret_Project.Domain.Entities.Tag", "Tag")
+                        .WithMany("ProductTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Product");
 
-                    b.Navigation("User");
+                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -708,15 +1171,9 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.AppUser", b =>
+            modelBuilder.Entity("AboutUs", b =>
                 {
-                    b.Navigation("Buyers");
-
-                    b.Navigation("Comments");
-
-                    b.Navigation("Favorites");
-
-                    b.Navigation("Sellers");
+                    b.Navigation("Image");
                 });
 
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Category", b =>
@@ -726,25 +1183,21 @@ namespace E_Ticaret_Project.Persistence.Migrations
                     b.Navigation("SubCategories");
                 });
 
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Order", b =>
-                {
-                    b.Navigation("Items");
-                });
-
             modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Product", b =>
                 {
-                    b.Navigation("Comments");
-
-                    b.Navigation("Favorites");
-
                     b.Navigation("Images");
 
-                    b.Navigation("Items");
+                    b.Navigation("ProductTags");
                 });
 
-            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.ReviewAndComment", b =>
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.SpecialRequest", b =>
                 {
-                    b.Navigation("Replies");
+                    b.Navigation("File");
+                });
+
+            modelBuilder.Entity("E_Ticaret_Project.Domain.Entities.Tag", b =>
+                {
+                    b.Navigation("ProductTags");
                 });
 #pragma warning restore 612, 618
         }
