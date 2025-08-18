@@ -22,7 +22,6 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = Permission.SiteSetting.GetAll)]
         [ProducesResponseType(typeof(BaseResponse<SiteSettingGetDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]

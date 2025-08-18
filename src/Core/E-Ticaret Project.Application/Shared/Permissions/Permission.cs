@@ -117,13 +117,11 @@ public static class Permission
 
     public static class SiteSetting
     {
-        public const string GetAll = "SiteSetting.GetAll";
         public const string Update = "SiteSetting.Update";
 
 
         public static List<string> All = new()
         {
-           GetAll,
            Update
         };
     }
