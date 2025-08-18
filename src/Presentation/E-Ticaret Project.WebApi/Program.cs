@@ -9,7 +9,6 @@ using E_Ticaret_Project.Persistence.Services;
 using E_Ticaret_Project.WebApi.Middlewares;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -98,6 +97,9 @@ builder.Services.AddDbContext<E_TicaretProjectDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
+
+
+
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
