@@ -19,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Text;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -116,14 +117,22 @@ builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JWTSettings>();
 
+var allowedOrigins = (builder.Configuration["Cors:AllowedOrigins"] ?? "")
+    .Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AppCors", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        if (allowedOrigins.Length > 0)
+            policy.WithOrigins(allowedOrigins)
+                 .AllowAnyHeader()
+                 .AllowAnyMethod()
+                 .AllowCredentials();
+        else
+            policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin(); // fallback
+
     });
 });
 
@@ -186,6 +195,16 @@ app.UseRequestLocalization(locOptions.Value);
 //    app.UseSwaggerUI();
 //}
 
+// ADDED ↓ — Render/NGINX-dən gələn X-Forwarded-* başlıqlarını qəbul et
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    // Render-in IP-ləri dinamikdir; bütün proxy-lərə etibar etmək üçün listləri təmizləyirik
+    // (əgər öz ətrafında proxy-lər təyin edəcəksənsə, KnownProxies/KnownNetworks əlavə et)
+    KnownNetworks = { },
+    KnownProxies = { }
+});
+
 var enableSwagger = app.Configuration.GetValue<bool>("EnableSwagger", true);
 if (enableSwagger)
 {
@@ -195,14 +214,15 @@ if (enableSwagger)
 
 // Configure the HTTP request pipeline.
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.MapHealthChecks("/health");
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+app.UseCors("AppCors");
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("AllowAll");
 //if (hangfireEnabled)
 //{
 //    app.UseHangfireDashboard("/hangfire");
