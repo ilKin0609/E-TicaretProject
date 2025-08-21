@@ -15,7 +15,10 @@ public class SiteSettingConfiguration : IEntityTypeConfiguration<SiteSetting>
             HidePopCategory = false,
             HideSearchBar = false,
             ScrollText = "Xoş gəlmisiniz!",
-            WhatsappInquiryLink = "https://wa.me/994000000000",
+            WhatsappInquiryLink = "https://wa.me/12025550123",
+            InstagramUrl = "https://www.facebook.com/NASA",
+            FacebookUrl = "https://www.instagram.com/instagram",
+            YoutubeUrl = "https://www.youtube.com/watch?v=jfKfPfyJRdk",
             CreatedAt = DateTime.UtcNow,
             CreatedUser = null,
             IsDeleted = false
