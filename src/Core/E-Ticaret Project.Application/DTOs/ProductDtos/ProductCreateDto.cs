@@ -21,5 +21,7 @@ public record ProductCreateDto(
     string? MetaDescriptionEn,
     string? MetaDescriptionRu,
     string? SlugAz,      // null gələrsə TitleAz-dan generasiya edə bilərsən
-    List<string>? Tags    // görünən tag; KeywordSlug serverdə NormalizeSlug ilə doldurulacaq
+    List<string>? Tags,    // görünən tag; KeywordSlug serverdə NormalizeSlug ilə doldurulacaq
+
+    List<ProductImageCreateDto>? Images
 );

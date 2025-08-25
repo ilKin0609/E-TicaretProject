@@ -42,8 +42,7 @@ public class ProductService : IProductService
 
     public async Task<BaseResponse<string>> CreateAsync(ProductCreateDto dto)
     {
-        if (dto.PriceAZN < 0 || (dto.PartnerPriceAZN.HasValue && dto.PartnerPriceAZN.Value < 0))
-            return new(_localizer.Get("Product_Invalid_Price"), HttpStatusCode.BadRequest);
+
 
         var skuExists = await _productRepository.AnyAsync(p => p.SKU == dto.SKU);
         if (skuExists)
@@ -60,6 +59,8 @@ public class ProductService : IProductService
 
         if (string.IsNullOrWhiteSpace(slugAz)) slugAz = null;
         else slugAz = await MakeUniqueProductSlugAsync(slugAz);
+
+
 
         var p = new Product
         {
@@ -80,7 +81,8 @@ public class ProductService : IProductService
             MetaDescriptionEn = dto.MetaDescriptionEn,
             MetaDescriptionRu = dto.MetaDescriptionRu,
             SlugAz = slugAz,
-            ProductTags = new List<ProductTag>()
+            ProductTags = new List<ProductTag>(),
+            Images = new List<ProductImage>()
         };
         if (dto.CategoryId is not null)
         {
@@ -101,10 +103,72 @@ public class ProductService : IProductService
             await AttachTagsAsync(p, tags);
 
         }
-
         await _productRepository.AddAsync(p);
         await _productRepository.SaveChangeAsync();
 
+        if (dto.Images is not null && dto.Images.Count > 0)
+        {
+            // 1) Yalnız faylı olan itemləri götür, SortOrder varsa ona görə sırala
+            var images = dto.Images
+                .Where(i => i.File is { Length: > 0 })
+                .OrderBy(i => i.SortOrder ?? int.MaxValue) // SortOrder verilməyənlər sonda
+                .ToList();
+
+
+            var anyFlaggedAsMain = images.Any(i => i.IsMain);
+            var mainSet = false;                 // artıq əsas təyin etmişikmi?
+            var nextOrder = 10;                  // SortOrder gəlməyibsə avtomatik artım
+
+            foreach (var img in images)
+            {
+                // 2) Fayl və tip yoxlaması
+                if (!IsValidImage(img.File))
+                    return new(_localizer.Get("Image_File_TypeNotAllowed"), HttpStatusCode.BadRequest);
+
+                // 3) Cloudinary-ə yüklə
+                var (url, publicId) = await _cloud.UploadImageAsync(img.File, $"ecommerce/products/{p.Id}");
+                if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(publicId))
+                    return new(_localizer.Get("Image_Upload_Failed"), HttpStatusCode.BadRequest);
+
+                // 4) Əsas şəkli təyin et
+                //    - Əgər frontend hansısa şəkli IsMain=true göndəribsə → yalnız BİRİNCİSİ əsas olur
+                //    - Heç biri işarələnməyibsə → dövrdə ilk yüklənən əsas olur
+                bool isMain = anyFlaggedAsMain ? (img.IsMain && !mainSet) : !mainSet;
+
+                // 5) Alt mətn məntiqi (auto və ya manual)
+                bool autoAlt = img.AutoAltFromMeta ?? true;
+                string altAz = autoAlt ? (p.MetaTitleAz ?? p.TitleAz) : (img.AltAz ?? p.TitleAz);
+                string altRu = autoAlt ? (p.MetaTitleRu ?? p.TitleRu ?? p.TitleAz) : (img.AltRu ?? p.TitleRu ?? p.TitleAz);
+                string altEn = autoAlt ? (p.MetaTitleEn ?? p.TitleEn ?? p.TitleAz) : (img.AltEn ?? p.TitleEn ?? p.TitleAz);
+
+                // 6) DB obyektini əlavə et
+                p.Images.Add(new ProductImage
+                {
+                    ProductId = p.Id,
+                    Url = url,
+                    PublicId = publicId,
+                    IsMain = isMain,
+                    SortOrder = img.SortOrder ?? (nextOrder += 10),
+                    AutoAltFromMeta = autoAlt,
+                    AltAz = altAz,
+                    AltRu = altRu,
+                    AltEn = altEn
+                });
+
+                if (isMain) mainSet = true;
+            }
+
+            // 7) Təhlükəsizlik: yenə də əsas yoxdursa, birincini əsas et
+            if (p.Images.Any() && !p.Images.Any(i => i.IsMain))
+            {
+                var first = p.Images.OrderBy(i => i.SortOrder).First(); // or FirstOrDefault()
+                first.IsMain = true;
+            }
+
+            // 8) Yadda saxla (Product artıq tracked-dir, yalnız Save kifayətdir)
+            await _productRepository.SaveChangeAsync();
+
+        }
         return new(_localizer.Get("Product_Created"), true, HttpStatusCode.Created);
     }
 

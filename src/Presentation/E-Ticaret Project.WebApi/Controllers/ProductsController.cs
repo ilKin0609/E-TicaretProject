@@ -141,12 +141,13 @@ namespace E_Ticaret_Project.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Policy = Permission.Product.Create)]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.Conflict)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDto dto)
+        public async Task<IActionResult> CreateProduct([FromForm] ProductCreateDto dto)
         {
             var result = await _productService.CreateAsync(dto);
             return StatusCode((int)result.StatusCode, result);
