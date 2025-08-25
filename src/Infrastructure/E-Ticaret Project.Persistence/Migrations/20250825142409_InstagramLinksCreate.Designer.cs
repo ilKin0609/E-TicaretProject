@@ -4,6 +4,7 @@ using E_Ticaret_Project.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_Ticaret_Project.Persistence.Migrations
 {
     [DbContext(typeof(E_TicaretProjectDbContext))]
-    partial class E_TicaretProjectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250825142409_InstagramLinksCreate")]
+    partial class InstagramLinksCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,7 +116,7 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                            CreatedAt = new DateTime(2025, 8, 25, 17, 34, 56, 203, DateTimeKind.Utc).AddTicks(7680),
+                            CreatedAt = new DateTime(2025, 8, 25, 14, 24, 8, 923, DateTimeKind.Utc).AddTicks(76),
                             DescriptionAZ = "LABstend Şirkəti",
                             DescriptionEN = "LABstend Company",
                             DescriptionRU = "Компания Лабстенд ",
@@ -426,7 +429,7 @@ namespace E_Ticaret_Project.Persistence.Migrations
                             AddressAZ = "Bakı, Azərbaycan",
                             AddressEN = "Baku, Azerbaijan",
                             AddressRU = "Баку, Азербайджан",
-                            CreatedAt = new DateTime(2025, 8, 25, 17, 34, 56, 204, DateTimeKind.Utc).AddTicks(8128),
+                            CreatedAt = new DateTime(2025, 8, 25, 14, 24, 8, 924, DateTimeKind.Utc).AddTicks(3846),
                             Email = "info@example.com",
                             IsDeleted = false,
                             Keywords = "Əlaqə, Bizimlə əlaqə, Contact, Communication",
@@ -1076,7 +1079,7 @@ namespace E_Ticaret_Project.Persistence.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                            CreatedAt = new DateTime(2025, 8, 25, 17, 34, 56, 206, DateTimeKind.Utc).AddTicks(7439),
+                            CreatedAt = new DateTime(2025, 8, 25, 14, 24, 8, 926, DateTimeKind.Utc).AddTicks(5717),
                             DisablePartnerLogin = false,
                             FacebookUrl = "https://www.instagram.com/instagram",
                             HidePopCategory = false,

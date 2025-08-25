@@ -23,6 +23,7 @@ public static class Registiration
         services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<IProductImageRepository, ProductImageRepository>();
         services.AddScoped<ISiteSettingRepository, SiteSettingRepository>();
+        services.AddScoped<IInstaLinkRepository, InstaLinkRepository>();
         #endregion
 
 
@@ -45,6 +46,7 @@ public static class Registiration
         services.AddScoped<IContactInfoService, ContactInfoService>();
         services.AddScoped<ISpecialRequestService, SpecialRequestService>();
         services.AddScoped<ISiteSettingService, SiteSettingService>();
+        services.AddScoped<IInstaLinkService, InstaLinkService>();
 
 
 

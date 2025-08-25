@@ -125,4 +125,17 @@ public static class Permission
            Update
         };
     }
+
+    public static class InstaLink
+    {
+        public const string Create = "InstaLink.Create";
+        public const string Delete = "InstaLink.Delete";
+
+
+        public static List<string> All = new()
+        {
+           Create,
+           Delete
+        };
+    }
 }

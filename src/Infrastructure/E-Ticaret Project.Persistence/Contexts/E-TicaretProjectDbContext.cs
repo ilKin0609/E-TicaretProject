@@ -23,6 +23,7 @@ public class E_TicaretProjectDbContext:IdentityDbContext<AppUser>
     public DbSet<SpecialRequest> SpecialRequests { get; set; }
     public DbSet<SiteSetting> SiteSetting { get; set; }
     public DbSet<KeywordSearchStat> KeywordSearchStats { get; set; }
+    public DbSet<InstagramLink> InstaLinks { get; set; }
 
 
 
