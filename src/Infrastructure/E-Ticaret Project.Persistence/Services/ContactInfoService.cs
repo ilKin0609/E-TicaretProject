@@ -60,62 +60,44 @@ public class ContactInfoService : IContactInfoService
         if (contact is null)
             return new(_localizer.Get("Contact_NotFound"), HttpStatusCode.NotFound);
 
-        if (contact is null)
-            return new(_localizer.Get("Contact_NotFound"), HttpStatusCode.NotFound);
 
-        // partial update – null və ya boş olanlara toxunulmur
-        if (!string.IsNullOrWhiteSpace(dto.Phone))
-            contact.Phone = dto.Phone;
 
-        if (!string.IsNullOrWhiteSpace(dto.Email))
-            contact.Email = dto.Email;
+        contact.Phone = Keep(contact.Phone, dto.Phone);
+        contact.Email = Keep(contact.Email, dto.Email);
+        contact.MapIframeSrc = Keep(contact.MapIframeSrc, dto.MapIframeSrc);
 
-        if (!string.IsNullOrWhiteSpace(dto.MapIframeSrc))
-            contact.MapIframeSrc = dto.MapIframeSrc;
+        contact.MetaTitle_Az = Keep(contact.MetaTitle_Az, dto.MetaTitle_Az);
+        contact.MetaTitle_En = Keep(contact.MetaTitle_En, dto.MetaTitle_En);
+        contact.MetaTitle_Ru = Keep(contact.MetaTitle_Ru, dto.MetaTitle_Ru);
 
-        if (!string.IsNullOrWhiteSpace(dto.MetaTitle_Az))
-            contact.MetaTitle_Az = dto.MetaTitle_Az;
+        contact.MetaDescription_Az = Keep(contact.MetaDescription_Az, dto.MetaDescription_Az);
+        contact.MetaDescription_En = Keep(contact.MetaDescription_En, dto.MetaDescription_En);
+        contact.MetaDescription_Ru = Keep(contact.MetaDescription_Ru, dto.MetaDescription_Ru);
 
-        if (!string.IsNullOrWhiteSpace(dto.MetaTitle_En))
-            contact.MetaTitle_En = dto.MetaTitle_En;
+        contact.Keywords = Keep(contact.Keywords, dto.Keywords);
 
-        if (!string.IsNullOrWhiteSpace(dto.MetaTitle_Ru))
-            contact.MetaTitle_Ru = dto.MetaTitle_Ru;
+        contact.Title_Az = Keep(contact.Title_Az, dto.Title_Az);
+        contact.Title_En = Keep(contact.Title_En, dto.Title_En);
+        contact.Title_Ru = Keep(contact.Title_Ru, dto.Title_Ru);
 
-        if (!string.IsNullOrWhiteSpace(dto.MetaDescription_Az))
-            contact.MetaDescription_Az = dto.MetaDescription_Az;
+        contact.AddressAZ = Keep(contact.AddressAZ, dto.AddressAZ);
+        contact.AddressEN = Keep(contact.AddressEN, dto.AddressEN);
+        contact.AddressRU = Keep(contact.AddressRU, dto.AddressRU);
 
-        if (!string.IsNullOrWhiteSpace(dto.MetaDescription_En))
-            contact.MetaDescription_En = dto.MetaDescription_En;
-
-        if (!string.IsNullOrWhiteSpace(dto.MetaDescription_Ru))
-            contact.MetaDescription_Ru = dto.MetaDescription_Ru;
-
-        if (!string.IsNullOrWhiteSpace(dto.Keywords))
-            contact.Keywords = dto.Keywords;
-
-        if (!string.IsNullOrWhiteSpace(dto.Title_Az))
-            contact.Title_Az = dto.Title_Az;
-
-        if (!string.IsNullOrWhiteSpace(dto.Title_En))
-            contact.Title_En = dto.Title_En;
-
-        if (!string.IsNullOrWhiteSpace(dto.Title_Ru))
-            contact.Title_Ru = dto.Title_Ru;
-
-        if (!string.IsNullOrWhiteSpace(dto.AddressAZ))
-            contact.AddressAZ = dto.AddressAZ;
-
-        if (!string.IsNullOrWhiteSpace(dto.AddressEN))
-            contact.AddressEN = dto.AddressEN;
-
-        if (!string.IsNullOrWhiteSpace(dto.AddressRU))
-            contact.AddressRU = dto.AddressRU;
+        contact.UpdatedAt = DateTime.UtcNow; // varsa
 
         _contactRepository.Update(contact);
         await _contactRepository.SaveChangeAsync();
 
         return new(_localizer.Get("Contact_Updated"), true, HttpStatusCode.OK);
     }
+
+
+
+
+
+
+    private static string Keep(string current, string? incoming)
+    => string.IsNullOrWhiteSpace(incoming) ? current : incoming.Trim();
 
 }

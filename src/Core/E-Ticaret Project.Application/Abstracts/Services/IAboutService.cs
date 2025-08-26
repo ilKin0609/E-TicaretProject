@@ -7,6 +7,6 @@ public interface IAboutService
 {
     Task<BaseResponse<string>> UpdateAsync(AboutUsUpdateDto dto);
     Task<BaseResponse<string>> AboutUploadImage(AboutUsUploadImageDto dto);
-    Task<BaseResponse<string>> RemoveImageAsync(Guid imageId);
+    Task<BaseResponse<string>> RemoveImageAsync();
     Task<BaseResponse<AboutUsGetDto>> GetAbout();
 }

@@ -53,14 +53,14 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
 
-        [HttpDelete("{imageId:guid}")]
+        [HttpDelete]
         [Authorize(Policy = Permission.About.RemoveImage)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RemoveImage([FromRoute] Guid imageId)
+        public async Task<IActionResult> RemoveImage()
         {
-            var result = await _aboutService.RemoveImageAsync(imageId);
+            var result = await _aboutService.RemoveImageAsync();
             return StatusCode((int)result.StatusCode, result);
         }
     }
