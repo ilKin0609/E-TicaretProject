@@ -81,7 +81,8 @@ public class AdminService : IAdminService
                 Login: u.UserName,
                 Password: _vault.Unprotect(u.PasswordVault),
                 RequestAt: u.PartnerRequestAt,
-                LastLoginAt: u.LastLoginAt
+                LastLoginAt: u.LastLoginAt,
+                isToggle: u.isToggle
             ));
         }
 
