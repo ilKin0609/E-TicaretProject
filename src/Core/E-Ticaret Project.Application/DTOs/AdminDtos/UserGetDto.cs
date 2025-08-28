@@ -2,6 +2,7 @@
 
 public record UserGetDto(
 
+    string userId,
     string FirstName,
     string LastName,
     string Company,

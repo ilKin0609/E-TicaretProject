@@ -71,6 +71,7 @@ public class AdminService : IAdminService
             if (!roles.Contains("Partnyor")) continue;
 
             list.Add(new UserGetDto(
+                userId: u.Id,
                 FirstName: u.Name,
                 LastName: u.Surname,
                 Company: u.Company,
