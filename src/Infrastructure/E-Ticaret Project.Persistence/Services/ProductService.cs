@@ -88,7 +88,7 @@ public class ProductService : IProductService
         {
             var leaf = await _categoryService.IsLeafAsync(dto.CategoryId.Value);
             if (!leaf.Success)
-                return new("Category has children please select child", HttpStatusCode.BadRequest);
+                return new("Category_MustBeLeaf", HttpStatusCode.BadRequest);
 
             p.CategoryId = dto.CategoryId;
 
@@ -103,8 +103,7 @@ public class ProductService : IProductService
             await AttachTagsAsync(p, tags);
 
         }
-        await _productRepository.AddAsync(p);
-        await _productRepository.SaveChangeAsync();
+       
 
         if (dto.Images is not null && dto.Images.Count > 0)
         {
@@ -113,10 +112,6 @@ public class ProductService : IProductService
                 .Where(i => i.File is { Length: > 0 })
                 .OrderBy(i => i.SortOrder ?? int.MaxValue) // SortOrder verilməyənlər sonda
                 .ToList();
-
-
-            var anyFlaggedAsMain = images.Any(i => i.IsMain);
-            var mainSet = false;                 // artıq əsas təyin etmişikmi?
             var nextOrder = 10;                  // SortOrder gəlməyibsə avtomatik artım
 
             foreach (var img in images)
@@ -126,14 +121,12 @@ public class ProductService : IProductService
                     return new(_localizer.Get("Image_File_TypeNotAllowed"), HttpStatusCode.BadRequest);
 
                 // 3) Cloudinary-ə yüklə
-                var (url, publicId) = await _cloud.UploadImageAsync(img.File, $"ecommerce/products/{p.Id}");
+                var (url, publicId) = await _cloud.UploadImageAsync(img.File, $"ecommerce/products/{sid}");
                 if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(publicId))
                     return new(_localizer.Get("Image_Upload_Failed"), HttpStatusCode.BadRequest);
 
-                // 4) Əsas şəkli təyin et
-                //    - Əgər frontend hansısa şəkli IsMain=true göndəribsə → yalnız BİRİNCİSİ əsas olur
-                //    - Heç biri işarələnməyibsə → dövrdə ilk yüklənən əsas olur
-                bool isMain = anyFlaggedAsMain ? (img.IsMain && !mainSet) : !mainSet;
+                
+                bool isMain = img.IsMain;
 
                 // 5) Alt mətn məntiqi (auto və ya manual)
                 bool autoAlt = img.AutoAltFromMeta ?? true;
@@ -144,7 +137,7 @@ public class ProductService : IProductService
                 // 6) DB obyektini əlavə et
                 p.Images.Add(new ProductImage
                 {
-                    ProductId = p.Id,
+                    
                     Url = url,
                     PublicId = publicId,
                     IsMain = isMain,
@@ -155,20 +148,12 @@ public class ProductService : IProductService
                     AltEn = altEn
                 });
 
-                if (isMain) mainSet = true;
             }
-
-            // 7) Təhlükəsizlik: yenə də əsas yoxdursa, birincini əsas et
-            if (p.Images.Any() && !p.Images.Any(i => i.IsMain))
-            {
-                var first = p.Images.OrderBy(i => i.SortOrder).First(); // or FirstOrDefault()
-                first.IsMain = true;
-            }
-
-            // 8) Yadda saxla (Product artıq tracked-dir, yalnız Save kifayətdir)
-            await _productRepository.SaveChangeAsync();
 
         }
+        await _productRepository.AddAsync(p);            
+        await _productRepository.SaveChangeAsync();
+
         return new(_localizer.Get("Product_Created"), true, HttpStatusCode.Created);
     }
 
