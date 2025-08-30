@@ -336,7 +336,7 @@ public class CategoryService : ICategoryService
             .OrderByDescending(x => x.Count)
             .ThenByDescending(x => x.LastSearchedAt)
             .Take(take)
-            .Select(x => new PopularTagDto(x.Keyword, x.Slug, x.Count))
+            .Select(x => new PopularTagDto(x.Id,x.Keyword, x.Slug, x.Count))
             .ToListAsync();
 
         if (list.Count == 0)
