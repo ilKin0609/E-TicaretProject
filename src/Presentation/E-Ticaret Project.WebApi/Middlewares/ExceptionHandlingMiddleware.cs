@@ -25,7 +25,7 @@ public class ExceptionHandlingMiddleware
     {
         try
         {
-            await _next(context); // Sonraki middleware kec
+            await _next(context); 
         }
         catch (Exception ex)
         {

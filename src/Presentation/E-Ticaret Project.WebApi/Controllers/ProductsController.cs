@@ -56,25 +56,25 @@ namespace E_Ticaret_Project.WebApi.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpGet]
-        [ProducesResponseType(typeof(BaseResponse<ProductCardDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetByProductCode([FromQuery] string ProductCode)
-        {
-            var result = await _productService.GetBySKUAsync(ProductCode);
-            return StatusCode((int)result.StatusCode, result);
-        }
+        //[HttpGet]
+        //[ProducesResponseType(typeof(BaseResponse<ProductCardDto>), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        //[ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        //public async Task<IActionResult> GetByProductCode([FromQuery] string ProductCode)
+        //{
+        //    var result = await _productService.GetBySKUAsync(ProductCode);
+        //    return StatusCode((int)result.StatusCode, result);
+        //}
 
-        [HttpGet]
-        [ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetBySearch([FromQuery] string search)
-        {
-            var result = await _productService.SearchAsync(search);
-            return StatusCode((int)result.StatusCode, result);
-        }
+        //[HttpGet]
+        //[ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        //[ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        //public async Task<IActionResult> GetBySearch([FromQuery] string search)
+        //{
+        //    var result = await _productService.SearchAsync(search);
+        //    return StatusCode((int)result.StatusCode, result);
+        //}
 
         [HttpGet]
         [ProducesResponseType(typeof(BaseResponse<List<ProductImageDto>>), (int)HttpStatusCode.OK)]
@@ -107,24 +107,33 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
 
-        [HttpGet]
-        [ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> SearchByTag([FromQuery] string Tag)
-        {
-            var result = await _productService.GetByTagAsync(Tag);
-            return StatusCode((int)result.StatusCode, result);
-        }
+        //[HttpGet]
+        //[ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        //[ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        //public async Task<IActionResult> SearchByTag([FromQuery] string Tag)
+        //{
+        //    var result = await _productService.GetByTagAsync(Tag);
+        //    return StatusCode((int)result.StatusCode, result);
+        //}
 
 
+        //[HttpGet]
+        //[ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        //[ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        //public async Task<IActionResult> SearchByManyTag([FromQuery] List<string> Tags)
+        //{
+        //    var result = await _productService.GetByTagsAsync(Tags);
+        //    return StatusCode((int)result.StatusCode, result);
+        //}
+
         [HttpGet]
         [ProducesResponseType(typeof(BaseResponse<List<ProductCardDto>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> SearchByManyTag([FromQuery] List<string> Tags)
+        public async Task<IActionResult> Search([FromQuery] string q)
         {
-            var result = await _productService.GetByTagsAsync(Tags);
+            var result = await _productService.SmartSearchAsync(q);
             return StatusCode((int)result.StatusCode, result);
         }
 
@@ -165,7 +174,7 @@ namespace E_Ticaret_Project.WebApi.Controllers
             return StatusCode((int)r.StatusCode, r);
         }
 
-        // --- UPLOAD ADDITIONAL ---
+        
         [HttpPost]
         [Authorize(Policy = Permission.Product.UploadAdditionalImage)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]

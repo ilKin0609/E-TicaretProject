@@ -665,6 +665,73 @@ public class ProductService : IProductService
             : new(_localizer.Get("Products_Found"), dtos, HttpStatusCode.OK);
     }
 
+    public async Task<BaseResponse<List<ProductCardDto>>> SmartSearchAsync(string q)
+    {
+        q = (q ?? "").Trim();
+        if (string.IsNullOrWhiteSpace(q))
+            return new BaseResponse<List<ProductCardDto>>("Products_NotFound", HttpStatusCode.OK)
+            {
+                Data = new List<ProductCardDto>() 
+            };
+
+        var seen = new HashSet<Guid>(); 
+        var ranked = new List<(ProductCardDto Item, int Rank)>();
+
+        
+        var skuRes = await GetBySKUAsync(q); 
+        if (skuRes?.Data != null)
+        {
+            var p = skuRes.Data;
+            if (AddUnique(seen, p))
+                ranked.Add((p, 3));
+        }
+
+       
+        var tags = ParseTags(q);
+        if (tags.Length > 0)
+        {
+            var tagRes = await GetByTagsAsync(tags); 
+            if (tagRes?.Data != null)
+                foreach (var p in tagRes.Data)
+                    if (AddUnique(seen, p))
+                        ranked.Add((p, 2));
+        }
+
+        
+        var textRes = await SearchAsync(q); 
+        if (textRes?.Data != null)
+        {
+            foreach (var p in textRes.Data)
+                if (AddUnique(seen, p))
+                    ranked.Add((p, 1));
+        }
+
+        var ordered = ranked
+            .OrderByDescending(x => x.Rank)
+            .Select(x => x.Item)
+            .ToList();
+
+        return new BaseResponse<List<ProductCardDto>>("Products_Found", ordered, HttpStatusCode.OK);
+
+        static string[] ParseTags(string input)
+        {
+            var split = input
+                .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Trim())
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            return split.Length > 0 ? split : new[] { input.Trim() };
+        }
+
+        
+        bool AddUnique(HashSet<Guid> set, ProductCardDto p)
+        {
+            return set.Add(p.Id);
+        }
+    }
+
     public async Task<BaseResponse<ProductCardDto>> GetBySKUAsync(string sku)
     {
         var p = await _productRepository.GetAll()

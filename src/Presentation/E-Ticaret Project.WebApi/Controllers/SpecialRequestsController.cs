@@ -1,8 +1,6 @@
 ﻿using E_Ticaret_Project.Application.Abstracts.Services;
 using E_Ticaret_Project.Application.DTOs.SpecialRequestDtos;
-using E_Ticaret_Project.Application.Shared.Permissions;
 using E_Ticaret_Project.Application.Shared.Responses;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 

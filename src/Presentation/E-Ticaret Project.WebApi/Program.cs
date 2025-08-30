@@ -209,7 +209,7 @@ var enableSwagger = app.Configuration.GetValue<bool>("EnableSwagger", true);
 if (enableSwagger)
 {
     app.UseSwagger();
-    app.UseSwaggerUI(); // /swagger və /swagger/index.html
+    app.UseSwaggerUI();
 }
 
 // Configure the HTTP request pipeline.

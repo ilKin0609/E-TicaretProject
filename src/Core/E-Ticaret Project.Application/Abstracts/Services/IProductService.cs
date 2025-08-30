@@ -21,8 +21,9 @@ public interface IProductService
     Task<BaseResponse<List<ProductCardDto>>> GetByTagId(Guid tagId);
     Task<BaseResponse<List<ProductCardDto>>> GetByTagAsync(string tag);
     Task<BaseResponse<List<ProductCardDto>>> GetByTagsAsync(IEnumerable<string> tags);
-    Task<BaseResponse<List<ProductCardDto>>> SearchAsync(string q); // title+desc
-    Task<BaseResponse<ProductCardDto>> GetBySKUAsync(string sku); // dəqiq uyğunluq (tez tapmaq üçün)
+    Task<BaseResponse<List<ProductCardDto>>> SearchAsync(string q);
+    Task<BaseResponse<List<ProductCardDto>>> SmartSearchAsync(string q);
+    Task<BaseResponse<ProductCardDto>> GetBySKUAsync(string sku); 
     Task<BaseResponse<List<ProductCardDto>>> GetAllAsync(int size = 40);
 
     //// ŞƏKİLLƏR
