@@ -79,7 +79,7 @@ public class SpecialRequestService : ISpecialRequestService
             if (ext is ".jpg" or ".jpeg" or ".png")
             {
                 fileSection = $@"
-                    <p><b>{_localizer.Get("SpecialRequest_Email_AttachedFile")}:</b></p>
+                    <p><b>{"Göndərilən fayl"}:</b></p>
                     <a href='{request.File.ImageUrl}' target='_blank'>
                         <img src='{request.File.ImageUrl}' width='200' style='margin:5px' />
                     </a>";
@@ -87,19 +87,19 @@ public class SpecialRequestService : ISpecialRequestService
             else
             {
                 fileSection = $@"
-                    <p><b>{_localizer.Get("SpecialRequest_Email_AttachedFile")}:</b></p>
+                    <p><b>{"Göndərilən fayl"}:</b></p>
                     <p><a href='{request.File.ImageUrl}' target='_blank'>{Path.GetFileName(request.File.ImageUrl)}</a></p>";
             }
         }
 
         var encodedOrder = WebUtility.HtmlEncode(dto.OrderAbout);
         var emailBody = $@"
-            <h2>{_localizer.Get("SpecialRequest_Email_Header")}</h2>
-            <p><b>{_localizer.Get("SpecialRequest_Email_Name")}:</b> {dto.Name}</p>
-            <p><b>{_localizer.Get("SpecialRequest_Email_Surname")}:</b> {dto.Surname}</p>
-            <p><b>{_localizer.Get("SpecialRequest_Email_Phone")}:</b> {dto.Phone}</p>
-            <p><b>{_localizer.Get("SpecialRequest_Email_Email")}:</b> {dto.Email}</p>
-            <p><b>{_localizer.Get("SpecialRequest_Email_Message")}:</b><br/>{encodedOrder}</p>
+            <h2>{"Xüsusi müraciet"}</h2>
+            <p><b>{"Ad"}:</b> {dto.Name}</p>
+            <p><b>{"Soyad"}:</b> {dto.Surname}</p>
+            <p><b>{"Telefon nömrəsi"}:</b> {dto.Phone}</p>
+            <p><b>{"Göndərən e-mail"}:</b> {dto.Email}</p>
+            <p><b>{"Xüsusi müraciət mesajı"}:</b><br/>{encodedOrder}</p>
             {fileSection}
         ";
 

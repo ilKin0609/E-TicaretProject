@@ -117,22 +117,28 @@ builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JWTSettings>();
 
-var allowedOrigins = (builder.Configuration["Cors:AllowedOrigins"] ?? "")
-    .Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? Array.Empty<string>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AppCors", policy =>
     {
         if (allowedOrigins.Length > 0)
-            policy.WithOrigins(allowedOrigins)
-                 .AllowAnyHeader()
-                 .AllowAnyMethod()
-                 .AllowCredentials();
+        {
+            policy.WithOrigins(allowedOrigins)   
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();          
+        }
         else
-            policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin(); // fallback
-
+        {
+            policy.AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowAnyOrigin();            
+        }
     });
 });
 
