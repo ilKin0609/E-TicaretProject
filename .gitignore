@@ -249,7 +249,7 @@ output.binlog
 # --- Custom ignores: keep secrets out of git ---
 **/appsettings.json
 **/appsettings.Development.json
-
+**/appsettings.Production.json
 
 AkavacheSqliteLinkerOverride.cs
 NuGetBuild
