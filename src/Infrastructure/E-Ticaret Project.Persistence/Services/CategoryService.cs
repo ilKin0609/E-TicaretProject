@@ -398,7 +398,7 @@ public class CategoryService : ICategoryService
         // start node (yalnız görünən)
         var current = await _categoryRepository.GetAll()
             .Where(c => c.Id == id && c.IsVisible)
-            .Select(c => new { c.Id, c.Slug, c.NameAz, c.NameRu, c.NameEn, c.ParentCategoryId })
+            .Select(c => new { c.Id, c.Slug, c.NameAz, c.NameEn, c.NameRu, c.ParentCategoryId })
             .FirstOrDefaultAsync();
 
         if (current is null)
@@ -414,7 +414,7 @@ public class CategoryService : ICategoryService
         {
             chain.Add(new CategoryBreadcrumbItemDto(
                 current.Id,
-               current.NameAz, current.NameRu, current.NameEn,
+               current.NameAz, current.NameEn, current.NameRu,
                 current.Slug ?? string.Empty
             ));
 
@@ -422,7 +422,7 @@ public class CategoryService : ICategoryService
 
             current = await _categoryRepository.GetAll()
                 .Where(c => c.Id == current.ParentCategoryId && c.IsVisible)
-                .Select(c => new { c.Id, c.Slug, c.NameAz, c.NameRu, c.NameEn, c.ParentCategoryId })
+                .Select(c => new { c.Id, c.Slug, c.NameAz, c.NameEn, c.NameRu, c.ParentCategoryId })
                 .FirstOrDefaultAsync();
         }
 
