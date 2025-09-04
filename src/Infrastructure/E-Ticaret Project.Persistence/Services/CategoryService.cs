@@ -414,7 +414,7 @@ public class CategoryService : ICategoryService
         {
             chain.Add(new CategoryBreadcrumbItemDto(
                 current.Id,
-                GetLocalizedName(current.NameAz, current.NameRu, current.NameEn),
+               current.NameAz, current.NameRu, current.NameEn,
                 current.Slug ?? string.Empty
             ));
 
@@ -605,18 +605,18 @@ public class CategoryService : ICategoryService
 
 
 
-    private static string GetLocalizedName(string nameAz, string? nameRu, string? nameEn)
-    {
-        var culture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
+    //private static string GetLocalizedName(string nameAz, string? nameRu, string? nameEn)
+    //{
+    //    var culture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
 
-        return culture switch
-        {
-            "az" => nameAz,
-            "ru" => nameRu ?? nameAz,
-            "en" => nameEn ?? nameAz,
-            _ => nameAz
-        };
-    }
+    //    return culture switch
+    //    {
+    //        "az" => nameAz,
+    //        "ru" => nameRu ?? nameAz,
+    //        "en" => nameEn ?? nameAz,
+    //        _ => nameAz
+    //    };
+    //}
     private async Task<List<SubCategoryDto>> BuildChildrenAsync(Guid parentId)
     {
         var children = await _categoryRepository.GetAllFiltered(

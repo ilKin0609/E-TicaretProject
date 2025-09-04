@@ -3,6 +3,8 @@
 public record CategoryBreadcrumbItemDto
 (
         Guid Id,
-        string Name,
+        string NameAz,
+        string NameEn,
+        string NameRu,
         string Slug
 );
