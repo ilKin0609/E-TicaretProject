@@ -251,6 +251,7 @@ public class AdminService : IAdminService
                 var err = string.Join("; ", pr.Errors.Select(e => e.Description));
                 return new($"{_localizer.Get("User_Password_Update_Failed")}: {err}", HttpStatusCode.BadRequest);
             }
+            user.PasswordVault = _vault.Protect(dto.Password);
         }
 
         var result = await _userManager.UpdateAsync(user);

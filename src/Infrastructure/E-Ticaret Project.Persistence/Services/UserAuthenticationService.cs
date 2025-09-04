@@ -28,6 +28,8 @@ public class UserAuthenticationService : IUserAuthenticationService
 
     private readonly string _receiverEmail;
 
+    private IPasswordVault _vault { get; }
+
     private ILocalizationService _localizer { get; }
     private ISiteSettingRepository _siteRepo { get; }
 
@@ -38,7 +40,8 @@ public class UserAuthenticationService : IUserAuthenticationService
     IEmailService mailService,
     IOptions<EmailSettings> emailOptions,
     ILocalizationService localizer,
-    ISiteSettingRepository siteRepo)
+    ISiteSettingRepository siteRepo,
+    IPasswordVault vault)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -48,6 +51,7 @@ public class UserAuthenticationService : IUserAuthenticationService
         _receiverEmail = emailOptions.Value.ReceiverEmail;
         _localizer = localizer;
         _siteRepo = siteRepo;
+        _vault = vault;
     }
     public async Task<BaseResponse<string>> Register(UserRegisterDto dto)
     {
@@ -197,6 +201,9 @@ public class UserAuthenticationService : IUserAuthenticationService
             var errors = string.Join("; ", result.Errors.Select(x => x.Description));
             return new(errors, HttpStatusCode.BadRequest);
         }
+
+        user.PasswordVault = _vault.Protect(dto.NewPassword);
+        await _userManager.UpdateAsync(user);
 
         var body =
                $"Şifrə uğurla yeniləndi\n";
