@@ -9,6 +9,5 @@ public record ProductImageCreateDto(
         int? SortOrder,             // göndərilməsə, server verəcək
         string? AltAz, 
         string? AltEn, 
-        string? AltRu, 
-        bool? AutoAltFromMeta 
+        string? AltRu
     );

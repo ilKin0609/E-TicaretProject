@@ -128,11 +128,7 @@ public class ProductService : IProductService
                 
                 bool isMain = img.IsMain;
 
-                // 5) Alt mətn məntiqi (auto və ya manual)
-                bool autoAlt = img.AutoAltFromMeta ?? true;
-                string altAz = autoAlt ? (p.MetaTitleAz ?? p.TitleAz) : (img.AltAz ?? p.TitleAz);
-                string altRu = autoAlt ? (p.MetaTitleRu ?? p.TitleRu ?? p.TitleAz) : (img.AltRu ?? p.TitleRu ?? p.TitleAz);
-                string altEn = autoAlt ? (p.MetaTitleEn ?? p.TitleEn ?? p.TitleAz) : (img.AltEn ?? p.TitleEn ?? p.TitleAz);
+               
 
                 // 6) DB obyektini əlavə et
                 p.Images.Add(new ProductImage
@@ -142,10 +138,9 @@ public class ProductService : IProductService
                     PublicId = publicId,
                     IsMain = isMain,
                     SortOrder = img.SortOrder ?? (nextOrder += 10),
-                    AutoAltFromMeta = autoAlt,
-                    AltAz = altAz,
-                    AltRu = altRu,
-                    AltEn = altEn
+                    AltAz = img.AltAz,
+                    AltRu = img.AltRu,
+                    AltEn = img.AltEn
                 });
 
             }
@@ -322,7 +317,7 @@ public class ProductService : IProductService
             .ThenBy(i => i.SortOrder)
             .Select(i => new ProductImageDto(
                 i.Id, i.Url, i.IsMain, i.SortOrder,
-                i.AltAz, i.AltRu, i.AltEn, i.AutoAltFromMeta
+                i.AltAz, i.AltRu, i.AltEn
             ))
             .ToList();
 
@@ -379,7 +374,7 @@ public class ProductService : IProductService
             .ThenBy(i => i.SortOrder)
             .Select(i => new ProductImageDto(
                 i.Id, i.Url, i.IsMain, i.SortOrder,
-                i.AltAz, i.AltRu, i.AltEn, i.AutoAltFromMeta
+                i.AltAz, i.AltRu, i.AltEn
             ))
             .ToList();
 
@@ -825,10 +820,9 @@ public class ProductService : IProductService
             PublicId = publicId,
             IsMain = true,
             SortOrder = NextOrder(p.Images),
-            AutoAltFromMeta = true,
-            AltAz = p.MetaTitleAz ?? p.TitleAz,
-            AltRu = p.MetaTitleRu ?? p.TitleRu ?? p.TitleAz,
-            AltEn = p.MetaTitleEn ?? p.TitleEn ?? p.TitleAz
+            AltAz = dto.AltAz,
+            AltRu = dto.AltRu,
+            AltEn = dto.AltEn
         };
 
         p.Images.Add(img);
@@ -873,10 +867,9 @@ public class ProductService : IProductService
             PublicId = publicId,
             IsMain = makeMain,
             SortOrder = NextOrder(p.Images),
-            AutoAltFromMeta = true,
-            AltAz = p.MetaTitleAz ?? p.TitleAz,
-            AltRu = p.MetaTitleRu ?? p.TitleRu ?? p.TitleAz,
-            AltEn = p.MetaTitleEn ?? p.TitleEn ?? p.TitleAz
+            AltAz = dto.AltAz,
+            AltRu = dto.AltRu,
+            AltEn = dto.AltEn
         };
 
         p.Images.Add(img);
@@ -963,21 +956,11 @@ public class ProductService : IProductService
         if (img is null || img.IsDeleted)
             return new(_localizer.Get("Image_NotFound"), HttpStatusCode.NotFound);
 
-        img.AutoAltFromMeta = dto.autoFromMeta;
-
-        if (dto.autoFromMeta)
-        {
-            var p = img.Product!;
-            img.AltAz = p.MetaTitleAz ?? p.TitleAz;
-            img.AltRu = p.MetaTitleRu ?? p.TitleRu ?? p.TitleAz;
-            img.AltEn = p.MetaTitleEn ?? p.TitleEn ?? p.TitleAz;
-        }
-        else
-        {
+       
             img.AltAz = dto.altAz;
             img.AltRu = dto.altRu;
             img.AltEn = dto.altEn;
-        }
+        
 
         _productImageRepository.Update(img);
         await _productImageRepository.SaveChangeAsync();
@@ -997,8 +980,7 @@ public class ProductService : IProductService
             i.SortOrder,
             i.AltAz,
             i.AltEn,
-            i.AltRu,
-            (bool?)i.AutoAltFromMeta
+            i.AltRu
         ))
         .ToListAsync();
 
@@ -1021,8 +1003,7 @@ public class ProductService : IProductService
              i.SortOrder,
              i.AltAz,
              i.AltEn,
-             i.AltRu,
-             (bool?)i.AutoAltFromMeta
+             i.AltRu
          ))
          .FirstOrDefaultAsync();
 

@@ -5,6 +5,6 @@ public record ProductUpdateAltDto(
     Guid imageId,
     string? altAz,
     string? altRu,
-    string? altEn,
-    bool autoFromMeta
+    string? altEn
+    
 );

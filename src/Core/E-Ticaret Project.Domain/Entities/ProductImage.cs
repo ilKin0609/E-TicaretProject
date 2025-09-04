@@ -13,6 +13,4 @@ public class ProductImage:BaseEntity
     public string? AltAz { get; set; }
     public string? AltEn { get; set; }
     public string? AltRu { get; set; }
-
-    public bool AutoAltFromMeta { get; set; }
 }

@@ -4,6 +4,7 @@ using E_Ticaret_Project.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_Ticaret_Project.Persistence.Migrations
 {
     [DbContext(typeof(E_TicaretProjectDbContext))]
-    partial class E_TicaretProjectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250904172247_AutoAltCancelled")]
+    partial class AutoAltCancelled
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

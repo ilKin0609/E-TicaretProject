@@ -8,6 +8,5 @@ public record ProductImageDto(
     int SortOrder,
     string? AltAz,
     string? AltEn,
-    string? AltRu,
-    bool? AutoAltFromMeta
+    string? AltRu
 );
