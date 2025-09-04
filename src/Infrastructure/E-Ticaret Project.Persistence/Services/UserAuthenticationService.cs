@@ -174,7 +174,10 @@ public class UserAuthenticationService : IUserAuthenticationService
 
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var link = $"{_jwtSetting.Issuer}/api/Authentications/ResetPassword?userId={user.Id}&token={HttpUtility.UrlEncode(token)}";
+        var baseUrl = _jwtSetting.Audience; 
+        var link = $"{baseUrl}/hesab/sifre-yenile/reset" +
+                   $"?userId={user.Id}" +
+                   $"&token={HttpUtility.UrlEncode(token)}";
 
         await _mailService.SendEmailAsync(new List<string> { user.Email! }, "Reset password", link);
 
