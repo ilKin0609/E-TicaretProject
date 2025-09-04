@@ -23,6 +23,31 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var allowedOrigins = builder.Configuration["Cors:AllowedOrigins"]?
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    ?? Array.Empty<string>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AppCors", policy =>
+    {
+        if (allowedOrigins.Length > 0)
+        {
+            policy
+                .WithOrigins(allowedOrigins)     
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetPreflightMaxAge(TimeSpan.FromHours(12));
+           
+        }
+        else
+        {
+            policy
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    });
+});
 
 builder.Services.AddControllers();
 
@@ -118,30 +143,7 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JWTSettings>();
 
 
-var allowedOrigins = builder.Configuration
-    .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>() ?? Array.Empty<string>();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AppCors", policy =>
-    {
-        if (allowedOrigins.Length > 0)
-        {
-            policy.WithOrigins(allowedOrigins)   
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials()
-                .SetPreflightMaxAge(TimeSpan.FromHours(12));
-}
-        else
-        {
-            policy.AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowAnyOrigin();            
-        }
-    });
-});
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
@@ -222,11 +224,11 @@ if (enableSwagger)
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
+app.UseCors("AppCors");
 
 app.MapHealthChecks("/health");
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-app.UseCors("AppCors");
 
 app.UseAuthentication();
 app.UseAuthorization();
