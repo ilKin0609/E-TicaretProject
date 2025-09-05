@@ -15,6 +15,7 @@ public class CategoryService : ICategoryService
     private ILocalizationService _localizer { get; }
     private IKeywordSearchStatRepository _keywordStatRepo { get; }
     private ITagRepository _tagRepo { get; }
+    
     public CategoryService(ICategoryRepository categoryRepository,
         ILocalizationService localizer,
         IKeywordSearchStatRepository keywordStatRepo,
@@ -335,17 +336,12 @@ public class CategoryService : ICategoryService
     }
     public async Task<BaseResponse<List<PopularTagDto>>> GetPopularTagsFromSearchAsync(int take = 8)
     {
-        //var list = await _keywordStatRepo.GetAll()
-        //    .OrderByDescending(x => x.Count)
-        //    .ThenByDescending(x => x.LastSearchedAt)
-        //    .Take(take)
-        //    .Select(x => new PopularTagDto(x.Id,x.Keyword, x.Slug, x.Count))
-        //    .ToListAsync();
-
+        
 
         var list = await (
         from ks in _keywordStatRepo.GetAll().Where(x => x.Slug != null && x.Slug != "")
         join t in _tagRepo.GetAll() on ks.Slug.ToLower() equals t.Slug.ToLower()
+        where t.ProductTags.Any()
         group ks by new { t.Id, t.Name, t.Slug } into g
         orderby g.Sum(x => x.Count) descending, g.Max(x => x.LastSearchedAt) descending
         select new PopularTagDto(
