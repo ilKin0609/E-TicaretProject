@@ -1073,7 +1073,7 @@ public class ProductService : IProductService
             .Replace("ə", "e").Replace("ö", "o").Replace("ü", "u")
             .Replace("ğ", "g").Replace("ı", "i").Replace("ş", "s").Replace("ç", "c");
 
-        input = Regex.Replace(input, @"[^a-z0-9\s-]", "");
+        input = Regex.Replace(input, @"[^\p{L}\p{Nd}\s-]", "");
         input = Regex.Replace(input, @"\s+", "-").Trim('-');
         return input;
     }
