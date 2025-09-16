@@ -103,7 +103,7 @@ public class ProductService : IProductService
             await AttachTagsAsync(p, tags);
 
         }
-       
+
 
         if (dto.Images is not null && dto.Images.Count > 0)
         {
@@ -125,15 +125,15 @@ public class ProductService : IProductService
                 if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(publicId))
                     return new(_localizer.Get("Image_Upload_Failed"), HttpStatusCode.BadRequest);
 
-                
+
                 bool isMain = img.IsMain;
 
-               
+
 
                 // 6) DB obyektini əlavə et
                 p.Images.Add(new ProductImage
                 {
-                    
+
                     Url = url,
                     PublicId = publicId,
                     IsMain = isMain,
@@ -146,7 +146,7 @@ public class ProductService : IProductService
             }
 
         }
-        await _productRepository.AddAsync(p);            
+        await _productRepository.AddAsync(p);
         await _productRepository.SaveChangeAsync();
 
         return new(_localizer.Get("Product_Created"), true, HttpStatusCode.Created);
@@ -651,14 +651,14 @@ public class ProductService : IProductService
         if (string.IsNullOrWhiteSpace(q))
             return new BaseResponse<List<ProductCardDto>>("Products_NotFound", HttpStatusCode.OK)
             {
-                Data = new List<ProductCardDto>() 
+                Data = new List<ProductCardDto>()
             };
 
-        var seen = new HashSet<Guid>(); 
+        var seen = new HashSet<Guid>();
         var ranked = new List<(ProductCardDto Item, int Rank)>();
 
-        
-        var skuRes = await GetBySKUAsync(q); 
+
+        var skuRes = await GetBySKUAsync(q);
         if (skuRes?.Data != null)
         {
             var p = skuRes.Data;
@@ -666,19 +666,19 @@ public class ProductService : IProductService
                 ranked.Add((p, 3));
         }
 
-       
+
         var tags = ParseTags(q);
         if (tags.Length > 0)
         {
-            var tagRes = await GetByTagsAsync(tags); 
+            var tagRes = await GetByTagsAsync(tags);
             if (tagRes?.Data != null)
                 foreach (var p in tagRes.Data)
                     if (AddUnique(seen, p))
                         ranked.Add((p, 2));
         }
 
-        
-        var textRes = await SearchAsync(q); 
+
+        var textRes = await SearchAsync(q);
         if (textRes?.Data != null)
         {
             foreach (var p in textRes.Data)
@@ -705,7 +705,7 @@ public class ProductService : IProductService
             return split.Length > 0 ? split : new[] { input.Trim() };
         }
 
-        
+
         bool AddUnique(HashSet<Guid> set, ProductCardDto p)
         {
             return set.Add(p.Id);
@@ -752,6 +752,7 @@ public class ProductService : IProductService
 
         var list = await _productRepository.GetAll()
             .Include(p => p.Images)
+
             .OrderBy(p => Guid.NewGuid())   // SQL Server: ORDER BY NEWID()
             .Take(size)
             .ToListAsync();
@@ -768,6 +769,8 @@ public class ProductService : IProductService
                 .Select(i => i.Url)
                 .FirstOrDefault();
 
+
+
             return new ProductCardDto(
                 p.Id,
                 p.SID,
@@ -781,6 +784,7 @@ public class ProductService : IProductService
                 p.PriceAZN,                // PriceUser
                 p.PartnerPriceAZN,         // PricePartnor
                 mainUrl                    // MainImageUrl
+
             );
         }).ToList();
 
@@ -956,11 +960,11 @@ public class ProductService : IProductService
         if (img is null || img.IsDeleted)
             return new(_localizer.Get("Image_NotFound"), HttpStatusCode.NotFound);
 
-       
-            img.AltAz = dto.altAz;
-            img.AltRu = dto.altRu;
-            img.AltEn = dto.altEn;
-        
+
+        img.AltAz = dto.altAz;
+        img.AltRu = dto.altRu;
+        img.AltEn = dto.altEn;
+
 
         _productImageRepository.Update(img);
         await _productImageRepository.SaveChangeAsync();
@@ -1026,8 +1030,8 @@ public class ProductService : IProductService
         var ct = file.ContentType?.ToLowerInvariant();
         var ext = Path.GetExtension(file.FileName)?.ToLowerInvariant();
 
-        bool okType = ct == "image/jpeg" || ct == "image/jpg" || ct == "image/png";
-        bool okExt = ext == ".jpg" || ext == ".jpeg" || ext == ".png";
+        bool okType = ct == "image/jpeg" || ct == "image/jpg" || ct == "image/png" || ct == "image/webp";
+        bool okExt = ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".webp";
         return okType || okExt;
     }
     private static int NextOrder(IEnumerable<ProductImage> images)

@@ -18,7 +18,7 @@ public class ProductAdditionalImageUploadDtoValidator:AbstractValidator<ProductA
             .Must(f =>
             {
                 var ext = Path.GetExtension(f.FileName)?.ToLowerInvariant();
-                return ext is ".jpg" or ".jpeg" or ".png";
+                return ext is ".jpg" or ".jpeg" or ".png" or ".webp";
             })
             .WithMessage(_ => L.Get("Image_File_Ext"));
     }

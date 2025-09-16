@@ -13,5 +13,5 @@ public record ProductCardDto(
     string? ShortDescEN,     
     decimal? PriceUser,
     decimal? PricePartnor,
-    string? MainImageUrl   
+    string? MainImageUrl
 );

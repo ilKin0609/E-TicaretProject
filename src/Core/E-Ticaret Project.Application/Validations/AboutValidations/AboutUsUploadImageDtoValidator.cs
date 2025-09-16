@@ -17,7 +17,7 @@ public class AboutUsUploadImageDtoValidator : AbstractValidator<AboutUsUploadIma
                 .WithMessage(_ => localizer.Get("ImageFile_Empty"))
             .Must(file =>
             {
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
                 var extension = Path.GetExtension(file.FileName).ToLower();
                 return allowedExtensions.Contains(extension);
             })
