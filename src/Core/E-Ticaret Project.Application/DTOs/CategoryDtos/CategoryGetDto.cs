@@ -19,6 +19,7 @@ public record CategoryGetDto
     string? MetaDescriptionRu,
     string? MetaDescriptionEn,
     string? Keywords,
+    int Order,
 
     Guid? ParentCategoryId,
     string? ParentCategoryName,
@@ -38,5 +39,6 @@ public record SubCategoryDto
     string? MetaDescriptionRu,
     string? MetaDescriptionEn,
     string? Keywords,
+    int Order,
     List<SubCategoryDto>? Children
 );

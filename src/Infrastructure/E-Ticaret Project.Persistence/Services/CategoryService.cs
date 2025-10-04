@@ -185,6 +185,7 @@ public class CategoryService : ICategoryService
             s.MetaTitleAz, s.MetaTitleRu, s.MetaTitleEn,
             s.MetaDescriptionAz, s.MetaDescriptionRu, s.MetaDescriptionEn,
             s.Keywords,
+            s.Order,
             null
 
         )).ToList();
@@ -195,6 +196,7 @@ public class CategoryService : ICategoryService
             category.MetaTitleAz, category.MetaTitleRu, category.MetaTitleEn,
             category.MetaDescriptionAz, category.MetaDescriptionRu, category.MetaDescriptionEn,
             category.Keywords,
+            category.Order,
             category.ParentCategoryId,
             category.ParentCategory?.NameAz,
             subs
@@ -229,6 +231,7 @@ public class CategoryService : ICategoryService
             c.MetaTitleAz, c.MetaTitleRu, c.MetaTitleEn,
             c.MetaDescriptionAz, c.MetaDescriptionRu, c.MetaDescriptionEn,
             c.Keywords,
+            c.Order,
             c.ParentCategoryId,
             c.ParentCategory?.NameAz,
             (c.SubCategories ?? new List<Category>())
@@ -239,6 +242,7 @@ public class CategoryService : ICategoryService
                     s.MetaTitleAz, s.MetaTitleRu, s.MetaTitleEn,
                     s.MetaDescriptionAz, s.MetaDescriptionRu, s.MetaDescriptionEn,
                     s.Keywords,
+                    s.Order,
                     null
                 )).ToList()
         )).ToList();
@@ -264,6 +268,7 @@ public class CategoryService : ICategoryService
             c.MetaTitleAz, c.MetaTitleRu, c.MetaTitleEn,
             c.MetaDescriptionAz, c.MetaDescriptionRu, c.MetaDescriptionEn,
             c.Keywords,
+            c.Order,
             c.ParentCategoryId,
             c.ParentCategory?.NameAz,
             (c.SubCategories ?? new List<Category>())
@@ -274,6 +279,7 @@ public class CategoryService : ICategoryService
                     s.MetaTitleAz, s.MetaTitleRu, s.MetaTitleEn,
                     s.MetaDescriptionAz, s.MetaDescriptionRu, s.MetaDescriptionEn,
                     s.Keywords,
+                    s.Order,
                     null
                 )).ToList()
         );
@@ -296,9 +302,11 @@ public class CategoryService : ICategoryService
             c.MetaTitleAz, c.MetaTitleRu, c.MetaTitleEn,
             c.MetaDescriptionAz, c.MetaDescriptionRu, c.MetaDescriptionEn,
             c.Keywords,
+            c.Order,
             null,
             null,
             null
+            
         )).ToList();
 
         return new(_localizer.Get("Category_found"), dtos, HttpStatusCode.OK);
@@ -319,6 +327,7 @@ public class CategoryService : ICategoryService
             c.MetaTitleAz, c.MetaTitleRu, c.MetaTitleEn,
             c.MetaDescriptionAz, c.MetaDescriptionRu, c.MetaDescriptionEn,
             c.Keywords,
+            c.Order,
             c.ParentCategoryId,
             c.ParentCategory?.NameAz,
             (c.SubCategories ?? new List<Category>())
@@ -328,6 +337,7 @@ public class CategoryService : ICategoryService
                     s.MetaTitleAz, s.MetaTitleRu, s.MetaTitleEn,
                     s.MetaDescriptionAz, s.MetaDescriptionRu, s.MetaDescriptionEn,
                     s.Keywords,
+                    s.Order,
                     null
                 )).ToList()
         )).ToList();
@@ -350,6 +360,7 @@ public class CategoryService : ICategoryService
             c.MetaTitleAz, c.MetaTitleRu, c.MetaTitleEn,
             c.MetaDescriptionAz, c.MetaDescriptionRu, c.MetaDescriptionEn,
             c.Keywords,
+            c.Order,
             null,
             null,
             null
@@ -373,6 +384,7 @@ public class CategoryService : ICategoryService
             c.MetaTitleAz, c.MetaTitleRu, c.MetaTitleEn,
             c.MetaDescriptionAz, c.MetaDescriptionRu, c.MetaDescriptionEn,
             c.Keywords,
+            c.Order,
             c.ParentCategoryId,
             c.ParentCategory?.NameAz,
             (c.SubCategories ?? new List<Category>())
@@ -382,6 +394,7 @@ public class CategoryService : ICategoryService
                     s.MetaTitleAz, s.MetaTitleRu, s.MetaTitleEn,
                     s.MetaDescriptionAz, s.MetaDescriptionRu, s.MetaDescriptionEn,
                     s.Keywords,
+                    s.Order,
                     null
                 )).ToList()
         )).ToList();
@@ -433,6 +446,7 @@ public class CategoryService : ICategoryService
                         r.MetaTitleAz, r.MetaTitleRu, r.MetaTitleEn,
                         r.MetaDescriptionAz, r.MetaDescriptionRu, r.MetaDescriptionEn,
                         r.Keywords,
+                        r.Order,
                         null,
                         null,
                         tree
@@ -685,6 +699,7 @@ public class CategoryService : ICategoryService
                 ch.MetaTitleAz, ch.MetaTitleRu, ch.MetaTitleEn,
                 ch.MetaDescriptionAz, ch.MetaDescriptionRu, ch.MetaDescriptionEn,
                 ch.Keywords,
+                ch.Order,
                 grandChildren
             ));
         }
