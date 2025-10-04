@@ -334,6 +334,60 @@ public class CategoryService : ICategoryService
 
         return new(_localizer.Get("Category_found"), dtos, HttpStatusCode.OK);
     }
+    public async Task<BaseResponse<List<CategoryGetDto>>> GetAllMainCategoriesAsyncForAdmin()
+    {
+        var mains = await _categoryRepository.GetAllFiltered(
+            x => x.ParentCategoryId == null,
+            OrderBy: x => x.Order
+        ).ToListAsync();
+
+        if (!mains.Any())
+            return new(_localizer.Get("Category_not_found"), HttpStatusCode.NotFound);
+
+        var dtos = mains.Select(c => new CategoryGetDto(
+            c.Id, c.NameAz, c.NameRu, c.NameEn,
+            c.Slug,
+            c.MetaTitleAz, c.MetaTitleRu, c.MetaTitleEn,
+            c.MetaDescriptionAz, c.MetaDescriptionRu, c.MetaDescriptionEn,
+            c.Keywords,
+            null,
+            null,
+            null
+        )).ToList();
+
+        return new(_localizer.Get("Category_found"), dtos, HttpStatusCode.OK);
+    }
+    public async Task<BaseResponse<List<CategoryGetDto>>> GetAllSubCategoriesAsyncForAdmin(Guid parentId)
+    {
+        var list = await _categoryRepository.GetAllFiltered(
+            x => x.ParentCategoryId == parentId,
+            OrderBy: x => x.Order
+        ).ToListAsync();
+
+        if (!list.Any())
+            return new(_localizer.Get("Category_not_found"), HttpStatusCode.NotFound);
+
+        var dtos = list.Select(c => new CategoryGetDto(
+            c.Id, c.NameAz, c.NameRu, c.NameEn,
+            c.Slug,
+            c.MetaTitleAz, c.MetaTitleRu, c.MetaTitleEn,
+            c.MetaDescriptionAz, c.MetaDescriptionRu, c.MetaDescriptionEn,
+            c.Keywords,
+            c.ParentCategoryId,
+            c.ParentCategory?.NameAz,
+            (c.SubCategories ?? new List<Category>())
+                .OrderBy(s => s.Order)
+                .Select(s => new SubCategoryDto(
+                    s.Id, s.NameAz, s.NameRu, s.NameEn, s.Slug,
+                    s.MetaTitleAz, s.MetaTitleRu, s.MetaTitleEn,
+                    s.MetaDescriptionAz, s.MetaDescriptionRu, s.MetaDescriptionEn,
+                    s.Keywords,
+                    null
+                )).ToList()
+        )).ToList();
+
+        return new(_localizer.Get("Category_found"), dtos, HttpStatusCode.OK);
+    }
     public async Task<BaseResponse<List<PopularTagDto>>> GetPopularTagsFromSearchAsync(int take = 8)
     {
         

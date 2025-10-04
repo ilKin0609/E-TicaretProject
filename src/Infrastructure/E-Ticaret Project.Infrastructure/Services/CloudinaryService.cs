@@ -69,10 +69,7 @@ public class CloudinaryService:ICloudinaryService
     {
         if (string.IsNullOrWhiteSpace(publicId)) return false;
 
-        var deletionParams = new DeletionParams(publicId)
-        {
-            ResourceType = ResourceType.Raw 
-        };
+        var deletionParams = new DeletionParams(publicId);
         var result = await _cloudinary.DestroyAsync(deletionParams);
 
         return result.Result == "ok" || result.Result == "not found";

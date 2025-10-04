@@ -76,6 +76,26 @@ namespace E_Ticaret_Project.WebApi.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<List<CategoryGetDto>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetAllMainCategoriesForAdmin()
+        {
+            var result = await _categoryService.GetAllMainCategoriesAsyncForAdmin();
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse<List<CategoryGetDto>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetAllSubCategoriesForAdmin([FromQuery] Guid parentId)
+        {
+            var result = await _categoryService.GetAllSubCategoriesAsyncForAdmin(parentId);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpGet]
         [ProducesResponseType(typeof(BaseResponse<List<CategoryBreadcrumbItemDto>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]

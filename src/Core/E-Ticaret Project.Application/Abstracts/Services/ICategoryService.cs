@@ -15,6 +15,8 @@ public interface ICategoryService
     Task<BaseResponse<CategoryGetDto>> GetBySlugAsync(string slug);
     Task<BaseResponse<List<CategoryGetDto>>> GetAllMainCategoriesAsync();
     Task<BaseResponse<List<CategoryGetDto>>> GetAllSubCategoriesAsync(Guid parentId);
+    Task<BaseResponse<List<CategoryGetDto>>> GetAllMainCategoriesAsyncForAdmin();
+    Task<BaseResponse<List<CategoryGetDto>>> GetAllSubCategoriesAsyncForAdmin(Guid parentId);
     Task<BaseResponse<List<CategoryBreadcrumbItemDto>>> GetBreadcrumbAsync(Guid id);
     Task<BaseResponse<List<PopularTagDto>>> GetPopularTagsFromSearchAsync(int take = 8);
     Task<BaseResponse<List<CategoryGetDto>>> GetAllRecursiveAsync();
